@@ -19,6 +19,7 @@
 | 13      | Security                             | `13-security.md`              |
 | 14      | Testing                              | `14-testing.md`               |
 | 15      | Conclusion & Future Scope            | `15-conclusion.md`            |
+| A       | Installation & Setup Guide (Windows/macOS/Linux) | `16-installation-guide.md` |
 
 ---
 
