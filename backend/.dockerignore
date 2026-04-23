@@ -1,0 +1,40 @@
+# Git
+.git
+.gitignore
+
+# Dev tools
+.editorconfig
+.phpunit.result.cache
+phpunit.xml
+.env
+.env.*
+!.env.example
+
+# Node (not needed in PHP image)
+node_modules
+
+# Tests
+tests
+
+# IDE
+.idea
+.vscode
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs & storage (use named volume instead)
+storage/logs/*
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/framework/views/*
+!storage/logs/.gitkeep
+!storage/framework/.gitkeep
+
+# Build artefacts
+bootstrap/cache/*.php
+
+# Dockerfile itself (not needed inside the image)
+Dockerfile

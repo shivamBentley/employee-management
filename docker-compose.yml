@@ -1,0 +1,131 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Employee Management System — Docker Compose
+#
+# Single command: make start   (or: docker compose up --build)
+#
+# Services
+#   mysql    → MySQL 8  (port 3306)
+#   backend  → Laravel 11 API + Queue + Reverb WebSocket  (ports 8000, 8080)
+#   frontend → React 18 served by Nginx  (port 3000)
+# ─────────────────────────────────────────────────────────────────────────────
+
+services:
+
+  # ── MySQL ──────────────────────────────────────────────────────────────────
+  mysql:
+    image: mysql:8.0
+    container_name: ems_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: employee_management
+    volumes:
+      - mysql_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    networks:
+      - ems_network
+
+  # ── Laravel Backend (API + Queue + Reverb) ─────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: ems_backend
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      # Application
+      APP_NAME: "Employee Management System"
+      APP_ENV: local
+      APP_KEY: "base64:eNk7R7J1QWjKWAPiIhQHaILvL2z30IAlOMvNA49ufqQ="   # generated; do not change
+      APP_DEBUG: "true"
+      APP_URL: "http://localhost:8000"
+
+      # Database  (uses Docker service name as host)
+      DB_CONNECTION: mysql
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_DATABASE: employee_management
+      DB_USERNAME: root
+      DB_PASSWORD: root
+
+      # Queue / Cache / Session
+      QUEUE_CONNECTION: database
+      CACHE_DRIVER: database
+      SESSION_DRIVER: database
+
+      # Broadcasting (Reverb)
+      BROADCAST_CONNECTION: reverb
+      REVERB_APP_ID: employee-ms
+      REVERB_APP_KEY: employee-ms-key
+      REVERB_APP_SECRET: employee-ms-secret
+      REVERB_HOST: "0.0.0.0"
+      REVERB_PORT: 8080
+      REVERB_SCHEME: http
+
+      # Sanctum
+      SANCTUM_STATEFUL_DOMAINS: "localhost:3000,localhost:5173"
+
+      # Mail (log driver — no SMTP needed for dev)
+      MAIL_MAILER: log
+    ports:
+      - "8000:8000"   # Laravel API
+      - "8080:8080"   # Reverb WebSocket
+    volumes:
+      - backend_storage:/var/www/storage
+      - backend_cache:/var/www/bootstrap/cache
+    healthcheck:
+      test: ["CMD-SHELL", "php artisan --version > /dev/null 2>&1"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 90s
+    networks:
+      - ems_network
+
+  # ── React Frontend (Nginx) ─────────────────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        # These are baked into the Vite build at image build time.
+        # They must point to URLs reachable from the USER'S BROWSER, not Docker.
+        VITE_API_URL: "http://localhost:8000/api"
+        VITE_REVERB_HOST: "localhost"
+        VITE_REVERB_PORT: "8080"
+        VITE_REVERB_SCHEME: "ws"
+        VITE_APP_NAME: "Employee Management System"
+    container_name: ems_frontend
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "3000:80"
+    networks:
+      - ems_network
+
+# ── Named Volumes ─────────────────────────────────────────────────────────────
+volumes:
+  mysql_data:
+    name: ems_mysql_data
+  backend_storage:
+    name: ems_backend_storage
+  backend_cache:
+    name: ems_backend_cache
+
+# ── Network ───────────────────────────────────────────────────────────────────
+networks:
+  ems_network:
+    name: ems_network
+    driver: bridge

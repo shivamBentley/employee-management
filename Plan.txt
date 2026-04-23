@@ -17,7 +17,10 @@ Tech stack:
             PHPUnit (built-in Laravel)
             Pest (modern alternative)
         Frontend:
-            Jest + React Testing Library    
+            Jest + React Testing Library   
+
+    NodeVersion: Latest
+    Laravel: latest 
 
 
 Feature: 
