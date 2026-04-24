@@ -32,7 +32,33 @@ This guide covers how to install and run the Employee Management System on **Win
 
 ---
 
-## A.2 Docker Setup (All Platforms)
+## A.2 Quick Start — Single Command Setup
+
+If you have **Docker Desktop** installed and running, the entire application can be set up with just **two commands**:
+
+```bash
+git clone https://github.com/shivamBentley/employee-management.git
+cd employee-management && make start
+```
+
+Or without `make`:
+
+```bash
+git clone https://github.com/shivamBentley/employee-management.git
+cd employee-management && docker compose up --build -d
+```
+
+This single command will automatically:
+1. Build the Docker images (PHP/Laravel backend, React/Nginx frontend, MySQL database)
+2. Install all PHP (Composer) and Node.js (npm) dependencies
+3. Run database migrations and seeders
+4. Start all three containers
+
+Once the containers are healthy (~1–2 minutes), open **http://localhost:3000** and log in with `admin@company.com` / `Admin@123`.
+
+---
+
+## A.3 Docker Setup — Detailed Steps
 
 ### Step 1 — Clone the Repository
 
@@ -121,7 +147,7 @@ Wait 1–2 minutes for all containers to become healthy, then open:
 
 ---
 
-## A.3 Local Setup (Without Docker)
+## A.4 Local Setup (Without Docker)
 
 ### Windows Setup
 
@@ -341,7 +367,7 @@ Open **http://localhost:5173** and login.
 
 ---
 
-## A.4 Troubleshooting
+## A.5 Troubleshooting
 
 | Problem                                          | Solution                                                      |
 | ------------------------------------------------ | ------------------------------------------------------------- |
@@ -358,7 +384,7 @@ Open **http://localhost:5173** and login.
 
 ---
 
-## A.5 Environment Variables Reference
+## A.6 Environment Variables Reference
 
 ### Backend (`backend/.env`)
 
