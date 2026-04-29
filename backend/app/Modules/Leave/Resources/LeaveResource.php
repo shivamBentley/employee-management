@@ -10,16 +10,19 @@ class LeaveResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id'           => $this->id,
-            'type'         => $this->type,
-            'start_date'   => $this->start_date,
-            'end_date'     => $this->end_date,
-            'status'       => $this->status,
-            'reason'       => $this->reason,
-            'scheduled_at' => $this->scheduled_at,
-            'user'         => $this->whenLoaded('user'),
-            'approver'     => $this->whenLoaded('approver'),
-            'created_at'   => $this->created_at,
+            'id'             => $this->id,
+            'type'           => $this->type,
+            'leave_type_id'  => $this->leave_type_id,
+            'leave_type'     => $this->whenLoaded('leaveType'),
+            'start_date'     => $this->start_date,
+            'end_date'       => $this->end_date,
+            'effective_hours' => $this->effective_hours,
+            'status'         => $this->status,
+            'reason'         => $this->reason,
+            'scheduled_at'   => $this->scheduled_at,
+            'user'           => $this->whenLoaded('user'),
+            'approver'       => $this->whenLoaded('approver'),
+            'created_at'     => $this->created_at,
         ];
     }
 }

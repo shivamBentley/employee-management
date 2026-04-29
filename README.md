@@ -1,6 +1,6 @@
-# Employee Management System
+# Employee Management System — v1.1.0
 
-A fullstack **Laravel 13 (REST API) + React 19 (SPA)** application with role-based access control, realtime presence via WebSocket, leave management, announcements, notifications, and admin tooling — all containerised with Docker.
+A fullstack **Laravel 13 (REST API) + React 19 (SPA)** application with role-based access control, realtime presence via WebSocket, advanced leave management (types, groups, balances, holidays), announcements, notifications, contextual help guides, and admin tooling — all containerised with Docker.
 
 ---
 
@@ -37,7 +37,11 @@ A fullstack **Laravel 13 (REST API) + React 19 (SPA)** application with role-bas
 │   │       ├── Dashboard/
 │   │       ├── Demo/
 │   │       ├── Department/
+│   │       ├── Holiday/
 │   │       ├── Leave/
+│   │       ├── LeaveBalance/
+│   │       ├── LeaveGroup/
+│   │       ├── LeaveType/
 │   │       ├── Notification/
 │   │       ├── Presence/
 │   │       ├── Setting/
@@ -50,9 +54,11 @@ A fullstack **Laravel 13 (REST API) + React 19 (SPA)** application with role-bas
 ├── frontend/         # React 19 SPA
 │   └── src/
 │       ├── modules/  # Feature modules (auth, dashboard, employees,
-│       │             #   departments, leaves, announcements,
-│       │             #   notifications, presence, settings, backup)
-│       ├── shared/   # AppLayout, Sidebar, Navbar, ProtectedRoute, RoleGuard
+│       │             #   departments, leaves, leave-types, leave-groups,
+│       │             #   holidays, announcements, notifications,
+│       │             #   presence, settings, backup)
+│       ├── shared/   # AppLayout, Sidebar, Navbar, HelpGuideModal,
+│       │             #   ProtectedRoute, RoleGuard, Breadcrumb
 │       ├── store/    # Zustand auth store
 │       └── router/   # React Router v6 routes
 │   └── Dockerfile
@@ -77,15 +83,21 @@ A fullstack **Laravel 13 (REST API) + React 19 (SPA)** application with role-bas
 | Feature | Admin | Employee |
 |---|---|---|
 | Dashboard stats & charts | ✅ | ✅ |
+| Employee home dashboard (profile, heatmap, balances) | — | ✅ |
 | Create / manage employees | ✅ | ❌ |
 | Edit own profile & bio | ✅ | ✅ |
 | Department management | ✅ | ❌ |
-| Apply for leave | ✅ | ✅ |
+| Apply for leave (type-aware with balance check) | ✅ | ✅ |
 | Approve / reject leave | ✅ | ❌ |
 | Cancel own pending leave | ✅ | ✅ |
+| Leave type management (casual, sick, annual, WFH, custom) | ✅ | ❌ |
+| Leave group management (balance policies per group) | ✅ | ❌ |
+| Leave balance tracking & provisioning | ✅ | ✅ |
+| Country-specific holiday calendar | ✅ | ✅ |
 | Publish announcements | ✅ | ❌ |
 | View announcements | ✅ | ✅ |
 | In-app notifications (polled every 30 s) | ✅ | ✅ |
+| Contextual help / user guide (per-page) | ✅ | ✅ |
 | Realtime presence status | ✅ | ✅ |
 | Export PDF / Excel report | ✅ | ✅ |
 | Feature toggle settings | ✅ | ❌ |
@@ -437,7 +449,23 @@ PUT                  /api/leaves/{id}/approve
 PUT                  /api/leaves/{id}/reject
 DELETE               /api/leaves/{id}
 
+GET/POST             /api/leave-types
+PUT/DELETE           /api/leave-types/{id}
+
+GET/POST             /api/leave-groups
+GET/PUT/DELETE       /api/leave-groups/{id}
+
+GET                  /api/leave-balances
+GET                  /api/leave-balances/monthly
+GET                  /api/leave-balances/calculate
+POST                 /api/leave-balances/provision
+
+GET/POST             /api/holidays
+GET                  /api/holidays/countries
+PUT/DELETE           /api/holidays/{id}
+
 GET                  /api/dashboard/stats
+GET                  /api/dashboard/leave-summary
 GET                  /api/reports/pdf
 GET                  /api/reports/excel
 

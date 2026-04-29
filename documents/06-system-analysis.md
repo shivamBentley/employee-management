@@ -11,10 +11,15 @@
 | Employees       | Admins can list, create, update, and delete employee accounts                    |
 | Departments     | Admins can create, rename, and delete departments; assign employees              |
 | Leave           | Employees submit leave requests; admins approve/reject; both see status          |
+| Leave Types     | Admins manage leave categories (casual, sick, annual, WFH, custom) with default balances |
+| Leave Groups    | Admins create balance policies (groups) with custom balances per leave type      |
+| Leave Balances  | System tracks per-employee leave balances; supports provisioning and monthly view |
+| Holidays        | Admins manage country-specific public holidays; excluded from leave calculations |
 | Announcements   | Admins create announcements; all users can view and search                       |
 | Presence        | Employees update their status; status visible in employee lists                  |
 | Notifications   | System delivers real-time notifications via WebSocket; users mark as read        |
-| Dashboard       | Admins see aggregate stats and per-department charts                             |
+| Dashboard       | Admins see aggregate stats and per-department charts; employees see personal dashboard |
+| Help Guide      | Contextual per-page user guide accessible via help icon in the navbar            |
 | Settings        | Admins toggle feature flags for individual modules                               |
 | Backup          | Admins trigger database backup and download backup files                         |
 | Reports         | Admins download PDF and Excel reports from the dashboard                         |
@@ -81,6 +86,10 @@ graph TB
         UC12[System Settings]
         UC13[Database Backup]
         UC14[Export Reports]
+        UC15[Manage Leave Types]
+        UC16[Manage Leave Groups]
+        UC17[Manage Holidays]
+        UC18[View Help Guide]
     end
 
     Admin((Admin))
@@ -99,6 +108,10 @@ graph TB
     Admin --> UC9
     Admin --> UC10
     Admin --> UC11
+    Admin --> UC15
+    Admin --> UC16
+    Admin --> UC17
+    Admin --> UC18
 
     Employee --> UC1
     Employee --> UC5
@@ -106,6 +119,7 @@ graph TB
     Employee --> UC9
     Employee --> UC10
     Employee --> UC11
+    Employee --> UC18
 ```
 
 ## 6.4 Data Flow Diagram (Level 0 — Context Diagram)
@@ -131,6 +145,8 @@ graph TB
         P5[5.0 Presence Tracking]
         P6[6.0 Report Generation]
         P7[7.0 Notification Delivery]
+        P8[8.0 Leave Type & Group Mgmt]
+        P9[9.0 Holiday Management]
     end
 
     User((User)) --> P1
@@ -146,6 +162,12 @@ graph TB
     P5 <--> DS5[(Presence Table)]
     P6 --> DS1
     P6 --> DS2
+
+    P8 <--> DS7[(Leave Types Table)]
+    P8 <--> DS8[(Leave Groups Table)]
+    P8 <--> DS9[(User Leave Balances)]
+    P9 <--> DS10[(Holidays Table)]
+    P3 --> P8
 
     P3 -->|Leave approved/rejected| P7
     P4 -->|New announcement| P7

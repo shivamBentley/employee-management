@@ -11,6 +11,10 @@ class DatabaseSeeder extends Seeder
         $this->call([
             AdminSeeder::class,
             SettingSeeder::class,
+            LeaveTypeSeeder::class,
+            LeaveGroupSeeder::class,
+            HolidaySeeder::class,
+            EmployeeSeeder::class,
         ]);
     }
 }

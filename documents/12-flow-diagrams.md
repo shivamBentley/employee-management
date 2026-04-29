@@ -205,3 +205,56 @@ flowchart TB
     A8 -->|Disabled| A9[Show 'Feature Disabled'<br>banner]
     A8 -->|Enabled| A10[Module works normally]
 ```
+
+## 12.10 Leave Type & Group Management Flow
+
+```mermaid
+flowchart TB
+    subgraph "Leave Type Management"
+        LT1([Admin]) --> LT2[Leave Types Page]
+        LT2 --> LT3[Create / Edit / Delete leave types]
+        LT3 --> LT4[Define name, default balance,<br>paid/unpaid, description]
+    end
+
+    subgraph "Leave Group Management"
+        LG1([Admin]) --> LG2[Leave Groups Page]
+        LG2 --> LG3[Create / Edit / Delete groups]
+        LG3 --> LG4[Add leave type items<br>with custom balances]
+        LG4 --> LG5[Mark one group<br>as default]
+    end
+
+    subgraph "Balance Provisioning"
+        LG5 --> BP1[Assign group to employee<br>via profile page]
+        BP1 --> BP2[POST /api/leave-balances/provision]
+        BP2 --> BP3[User leave balances<br>created/updated]
+    end
+
+    LT4 --> LG3
+```
+
+## 12.11 Holiday Management Flow
+
+```mermaid
+flowchart LR
+    A1([Admin]) --> A2[Holidays Page]
+    A2 --> A3[Filter by country<br>and year]
+    A3 --> A4[View holidays list]
+    A2 --> A5[Add Holiday]
+    A5 --> A6[Select country,<br>enter name + date]
+    A6 --> A7[POST /api/holidays]
+    A7 --> A8[Holiday created]
+    A8 --> A9[Excluded from<br>leave day calculations]
+    A9 --> A10[Shown on employee<br>dashboard heatmap]
+```
+
+## 12.12 Help Guide Flow
+
+```mermaid
+flowchart TB
+    U1([User]) --> U2[Any page in EMS]
+    U2 --> U3[Click help icon<br>in navbar]
+    U3 --> U4[HelpGuideModal opens]
+    U4 --> U5[Shows contextual guide<br>for current page]
+    U5 --> U6[Sections: Overview,<br>How to Use, Tips]
+    U6 --> U7[Click 'Got it'<br>to close]
+```

@@ -43,7 +43,7 @@ export default function LeaveListPage() {
   };
   useEffect(load, []);
 
-  const leaveTypes = useMemo(() => [...new Set(leaves.map((l) => l.type))], [leaves]);
+  const leaveTypes = useMemo(() => [...new Set(leaves.map((l) => l.leave_type?.name || l.type).filter(Boolean))], [leaves]);
 
   const toggleSort = (key) => {
     if (sortKey === key) setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
@@ -57,7 +57,7 @@ export default function LeaveListPage() {
       list = list.filter((l) => (l.user?.name ?? '').toLowerCase().includes(q));
     }
     if (filterStatus) list = list.filter((l) => l.status === filterStatus);
-    if (filterType)   list = list.filter((l) => l.type === filterType);
+    if (filterType)   list = list.filter((l) => (l.leave_type?.name || l.type) === filterType);
     list.sort((a, b) => {
       if (sortKey === 'employee') {
         const cmp = (a.user?.name ?? '').localeCompare(b.user?.name ?? '');
@@ -98,6 +98,7 @@ export default function LeaveListPage() {
     { key: null,         label: 'Type' },
     { key: 'start_date', label: 'From' },
     { key: null,         label: 'To' },
+    { key: null,         label: 'Hours' },
     { key: 'status',     label: 'Status' },
     { key: null,         label: 'Actions' },
   ];
@@ -145,7 +146,7 @@ export default function LeaveListPage() {
         >
           <option value="">All Types</option>
           {leaveTypes.map((t) => (
-            <option key={t} value={t}>{t.charAt(0).toUpperCase() + t.slice(1)}</option>
+            <option key={t} value={t}>{t}</option>
           ))}
         </select>
       </div>
@@ -184,9 +185,10 @@ export default function LeaveListPage() {
               {filtered.map((l) => (
                 <tr key={l.id} className="hover:bg-slate-50 transition">
                   <td className="px-4 py-3 font-medium text-gray-800 whitespace-nowrap">{l.user?.name ?? 'You'}</td>
-                  <td className="px-4 py-3 text-gray-500 capitalize whitespace-nowrap">{l.type}</td>
+                  <td className="px-4 py-3 text-gray-500 whitespace-nowrap">{l.leave_type?.name || l.type}</td>
                   <td className="px-4 py-3 text-gray-500 whitespace-nowrap">{fmtDate(l.start_date)}</td>
                   <td className="px-4 py-3 text-gray-500 whitespace-nowrap">{fmtDate(l.end_date)}</td>
+                  <td className="px-4 py-3 text-gray-600 whitespace-nowrap">{l.effective_hours ?? '—'}</td>
                   <td className="px-4 py-3 whitespace-nowrap">
                     <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${STATUS_COLORS[l.status]}`}>
                       {l.status}

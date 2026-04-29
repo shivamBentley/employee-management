@@ -23,7 +23,7 @@
 ## 5.2 Secondary Objectives
 
 7. **Dashboard Analytics**
-   Provide admin users with real-time statistics — total employees, active count, on-leave today, pending requests — with a department distribution chart.
+   Provide admin users with real-time statistics — total employees, active count, on-leave today, pending requests — with a department distribution chart. Provide employees with a personal home dashboard featuring profile summary, leave heatmap, and upcoming holidays.
 
 8. **Report Generation**
    Enable PDF and Excel export of employee/department reports for offline use and management meetings.
@@ -39,6 +39,12 @@
 
 12. **Toast Notification System**
     Provide user-friendly success/error/warning feedback for every action using a global toast notification system.
+
+13. **Advanced Leave Management**
+    Support configurable leave types (casual, sick, annual, WFH, custom), leave groups with per-type balances, per-employee leave balance tracking, and country-specific holiday calendars.
+
+14. **Contextual Help & User Guide**
+    Provide a per-page contextual help system accessible from the navbar, showing relevant user guide content for the current page.
 
 ## 5.3 Learning Objectives
 

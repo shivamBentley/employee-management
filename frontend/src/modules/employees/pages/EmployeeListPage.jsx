@@ -2,7 +2,7 @@ import { useEffect, useState, useMemo } from 'react';
 import { getEmployees, deleteEmployee } from '../api';
 import { Link } from 'react-router-dom';
 import StatusBadge from '../../presence/components/StatusBadge';
-import { Pencil, Trash2, Plus, Search, ChevronUp, ChevronDown } from 'lucide-react';
+import { Pencil, Trash2, Plus, Search, ChevronUp, ChevronDown, Eye } from 'lucide-react';
 import CreateEmployeeModal from '../components/CreateEmployeeModal';
 import useToastStore from '../../../store/toastStore';
 
@@ -14,6 +14,17 @@ function SortIcon({ field, sortKey, sortDir }) {
 }
 
 const DEFAULT_AVATAR = 'https://ui-avatars.com/api/?background=6366f1&color=fff&bold=true&size=64';
+
+/** Convert 2-letter country code to flag emoji */
+const countryFlag = (code) => {
+  if (!code) return '';
+  return String.fromCodePoint(...[...code.toUpperCase()].map((c) => 0x1f1e6 - 65 + c.charCodeAt(0)));
+};
+
+const COUNTRY_NAMES = {
+  IN: 'India', US: 'United States', GB: 'United Kingdom', CA: 'Canada',
+  AU: 'Australia', DE: 'Germany', FR: 'France', SG: 'Singapore', AE: 'UAE', JP: 'Japan',
+};
 
 export default function EmployeeListPage() {
   const [employees, setEmployees] = useState([]);
@@ -70,6 +81,8 @@ export default function EmployeeListPage() {
       if (sortKey === 'name')       { va = a.name;                       vb = b.name; }
       else if (sortKey === 'department') { va = a.department?.name ?? ''; vb = b.department?.name ?? ''; }
       else if (sortKey === 'position')   { va = a.position ?? '';         vb = b.position ?? ''; }
+      else if (sortKey === 'country')    { va = a.country_code ?? '';     vb = b.country_code ?? ''; }
+      else if (sortKey === 'group')      { va = a.leave_group?.name ?? ''; vb = b.leave_group?.name ?? ''; }
       else if (sortKey === 'status')     { va = a.presence?.status ?? 'offline'; vb = b.presence?.status ?? 'offline'; }
       const cmp = String(va).localeCompare(String(vb));
       return sortDir === 'asc' ? cmp : -cmp;
@@ -79,9 +92,11 @@ export default function EmployeeListPage() {
 
   const COLS = [
     { key: 'name',       label: 'Name' },
-    { key: 'email',      label: 'Email' },
+    { key: null,         label: 'Email' },
     { key: 'department', label: 'Department' },
     { key: 'position',   label: 'Position' },
+    { key: 'country',    label: 'Country' },
+    { key: 'group',      label: 'Leave Group' },
     { key: 'status',     label: 'Status' },
     { key: null,         label: 'Actions' },
   ];
@@ -174,10 +189,20 @@ export default function EmployeeListPage() {
                   <td className="px-4 py-3 text-gray-500 truncate max-w-[180px]">{emp.email}</td>
                   <td className="px-4 py-3 text-gray-500 whitespace-nowrap">{emp.department?.name || '—'}</td>
                   <td className="px-4 py-3 text-gray-500 whitespace-nowrap">{emp.position || '—'}</td>
+                  <td className="px-4 py-3 text-gray-500 whitespace-nowrap">
+                    {emp.country_code ? (
+                      <span title={COUNTRY_NAMES[emp.country_code] || emp.country_code}>
+                        <span className="text-base mr-1">{countryFlag(emp.country_code)}</span>
+                        {emp.country_code}
+                      </span>
+                    ) : '—'}
+                  </td>
+                  <td className="px-4 py-3 text-gray-500 whitespace-nowrap text-xs">{emp.leave_group?.name || '—'}</td>
                   <td className="px-4 py-3"><StatusBadge status={emp.presence?.status ?? 'offline'} showLabel /></td>
                   <td className="px-4 py-3">
-                    <div className="flex gap-2">
-                      <Link to={`/employees/${emp.id}`} className="p-1.5 rounded hover:bg-indigo-50 text-indigo-600" title="Edit"><Pencil size={14} /></Link>
+                    <div className="flex gap-1">
+                      <Link to={`/employees/${emp.id}`} className="p-1.5 rounded hover:bg-indigo-50 text-indigo-600" title="View Profile"><Eye size={14} /></Link>
+                      <Link to={`/employees/${emp.id}`} className="p-1.5 rounded hover:bg-blue-50 text-blue-600" title="Edit"><Pencil size={14} /></Link>
                       <button onClick={() => handleDelete(emp.id, emp.name)} className="p-1.5 rounded hover:bg-red-50 text-red-500" title="Delete"><Trash2 size={14} /></button>
                     </div>
                   </td>

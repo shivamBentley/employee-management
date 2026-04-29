@@ -8,16 +8,19 @@ The **Employee Management System (EMS)** has been successfully designed, develop
 | ---------------------------------- | ------ | ---------------------------------------------- |
 | Centralized employee data          | ✅     | MySQL database with Eloquent ORM               |
 | Automated leave workflow           | ✅     | Apply → Approve/Reject pipeline with notifications |
+| Advanced leave management          | ✅     | Configurable leave types, groups, balances, and holiday calendar |
 | Real-time presence tracking        | ✅     | Laravel Reverb WebSocket broadcasting          |
 | Role-based access control          | ✅     | Sanctum tokens + admin/employee roles          |
 | Responsive modern UI               | ✅     | React SPA with Tailwind CSS                    |
 | Containerized deployment           | ✅     | Docker Compose with 3 containers               |
-| Dashboard analytics                | ✅     | Stats cards + Recharts department chart         |
+| Dashboard analytics                | ✅     | Admin stats cards + charts; employee personal dashboard with heatmap |
 | Report generation                  | ✅     | PDF (DomPDF) and Excel (Maatwebsite)            |
 | Internal announcements             | ✅     | CRUD with real-time notification delivery       |
 | Database backup                    | ✅     | Spatie Backup with download capability          |
 | Feature flag system                | ✅     | Settings-based toggle for modules               |
 | Toast notification system          | ✅     | Global Zustand-based toast notifications        |
+| Contextual help / user guide       | ✅     | Per-page HelpGuideModal with role-aware content |
+| Country-specific holidays          | ✅     | Holiday CRUD with multi-country support         |
 
 The system demonstrates comprehensive software engineering skills including:
 

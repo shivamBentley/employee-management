@@ -1,8 +1,10 @@
-import { Menu, ChevronDown } from 'lucide-react';
+import { useState } from 'react';
+import { Menu, ChevronDown, HelpCircle } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import useAuthStore from '../../store/authStore';
 import StatusDropdown from '../../modules/presence/components/StatusDropdown';
 import NotificationBell from '../../modules/notifications/components/NotificationBell';
+import HelpGuideModal from './HelpGuideModal';
 
 const PAGE_TITLES = {
   '/dashboard':     'Dashboard',
@@ -20,6 +22,7 @@ export default function Navbar({ onMenuClick }) {
   const { user } = useAuthStore();
   const navigate = useNavigate();
   const { pathname } = useLocation();
+  const [helpOpen, setHelpOpen] = useState(false);
 
   const pageTitle =
     PAGE_TITLES[pathname]
@@ -56,6 +59,17 @@ export default function Navbar({ onMenuClick }) {
         </div>
 
         <NotificationBell />
+
+        <button
+          onClick={() => setHelpOpen(true)}
+          className="p-2 rounded-lg hover:bg-gray-100 transition"
+          aria-label="Help & User Guide"
+          title="Help & User Guide"
+        >
+          <HelpCircle size={20} className="text-gray-600" />
+        </button>
+
+        <HelpGuideModal open={helpOpen} onClose={() => setHelpOpen(false)} />
 
         <div className="w-px h-6 bg-slate-200 mx-1 hidden sm:block" />
 

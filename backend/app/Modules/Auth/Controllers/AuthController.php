@@ -28,7 +28,7 @@ class AuthController extends Controller
 
         return response()->json([
             'token' => $token,
-            'user'  => new UserResource($user->load('presence', 'department')),
+            'user'  => new UserResource($user->load('presence', 'department', 'leaveGroup')),
         ]);
     }
 
@@ -41,7 +41,7 @@ class AuthController extends Controller
     public function me(Request $request): JsonResponse
     {
         return response()->json([
-            'user' => new UserResource($request->user()->load('presence', 'department')),
+            'user' => new UserResource($request->user()->load('presence', 'department', 'leaveGroup')),
         ]);
     }
 }

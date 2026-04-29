@@ -13,8 +13,12 @@ class User extends Authenticatable
 
     protected $fillable = [
         'name', 'email', 'password', 'role',
-        'department_id', 'position', 'phone',
-        'bio', 'avatar', 'is_active',
+        'department_id', 'country_code', 'leave_group_id',
+        'position', 'phone', 'bio', 'avatar', 'is_active',
+        'skills', 'address', 'city', 'state', 'zip_code',
+        'education', 'experience', 'team_name',
+        'salary', 'salary_currency', 'date_of_joining', 'date_of_birth',
+        'linkedin_url', 'emergency_contact_name', 'emergency_contact_phone',
     ];
 
     protected $hidden = ['password', 'remember_token'];
@@ -23,11 +27,27 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password'          => 'hashed',
         'is_active'         => 'boolean',
+        'skills'            => 'array',
+        'education'         => 'array',
+        'experience'        => 'array',
+        'salary'            => 'decimal:2',
+        'date_of_joining'   => 'date',
+        'date_of_birth'     => 'date',
     ];
 
     public function department()
     {
         return $this->belongsTo(\App\Modules\Department\Models\Department::class);
+    }
+
+    public function leaveGroup()
+    {
+        return $this->belongsTo(\App\Modules\LeaveGroup\Models\LeaveGroup::class);
+    }
+
+    public function leaveBalances()
+    {
+        return $this->hasMany(\App\Modules\LeaveBalance\Models\UserLeaveBalance::class);
     }
 
     public function presence()

@@ -11,6 +11,9 @@ import {
   Building2,
   LogOut,
   X,
+  ListTree,
+  Package,
+  Calendar,
 } from 'lucide-react';
 
 const adminNav = [
@@ -18,6 +21,9 @@ const adminNav = [
   { to: '/employees', label: 'Employees', Icon: Users },
   { to: '/departments', label: 'Departments', Icon: Building2 },
   { to: '/leaves', label: 'Leave Management', Icon: CalendarDays },
+  { to: '/leave-types', label: 'Leave Types', Icon: ListTree },
+  { to: '/leave-groups', label: 'Leave Groups', Icon: Package },
+  { to: '/holidays', label: 'Holidays', Icon: Calendar },
   { to: '/announcements', label: 'Announcements', Icon: Megaphone },
   { to: '/settings', label: 'Settings', Icon: Settings },
   { to: '/backup', label: 'Backup & Restore', Icon: Database },
@@ -26,6 +32,7 @@ const adminNav = [
 const employeeNav = [
   { to: '/dashboard', label: 'Dashboard', Icon: LayoutDashboard },
   { to: '/leaves', label: 'My Leaves', Icon: CalendarDays },
+  { to: '/holidays', label: 'Holidays', Icon: Calendar },
   { to: '/announcements', label: 'Announcements', Icon: Megaphone },
 ];
 
@@ -60,7 +67,7 @@ export default function Sidebar({ open, onClose }) {
             </div>
             <div>
               <p className="text-white font-semibold text-sm leading-none">EMS Portal</p>
-              <p className="text-slate-400 text-[11px] mt-0.5 capitalize">{user?.role}</p>
+              <p className="text-slate-400 text-[11px] mt-0.5 capitalize">{user?.role} · v1.1.0</p>
             </div>
           </div>
           {/* Mobile close button */}

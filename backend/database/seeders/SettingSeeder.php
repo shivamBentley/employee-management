@@ -14,6 +14,7 @@ class SettingSeeder extends Seeder
             ['key' => 'announcements_enabled',       'value' => '1', 'scope' => 'global'],
             ['key' => 'presence_tracking_enabled',   'value' => '1', 'scope' => 'global'],
             ['key' => 'backup_enabled',              'value' => '1', 'scope' => 'admin'],
+            ['key' => 'holiday_management_enabled',   'value' => '1', 'scope' => 'global'],
         ];
 
         foreach ($defaults as $setting) {

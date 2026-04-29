@@ -45,8 +45,22 @@ backend/
 │   │   │   ├── Models/
 │   │   │   ├── Requests/
 │   │   │   ├── Resources/
-│   │   │   └── routes.php
-│   │   ├── Announcement/
+│   │   │   └── routes.php    │   ├── LeaveType/
+    │   │   ├── Controllers/
+    │   │   ├── Models/
+    │   │   └── routes.php
+    │   ├── LeaveGroup/
+    │   │   ├── Controllers/
+    │   │   ├── Models/
+    │   │   └── routes.php
+    │   ├── LeaveBalance/
+    │   │   ├── Controllers/
+    │   │   ├── Models/
+    │   │   └── routes.php
+    │   ├── Holiday/
+    │   │   ├── Controllers/
+    │   │   ├── Models/
+    │   │   └── routes.php│   │   ├── Announcement/
 │   │   │   ├── Controllers/
 │   │   │   ├── Models/
 │   │   │   ├── Resources/
@@ -118,11 +132,13 @@ frontend/
 │   │   │   ├── Sidebar.jsx         # Navigation sidebar
 │   │   │   ├── Navbar.jsx          # Top navigation bar
 │   │   │   ├── Breadcrumb.jsx      # Breadcrumb navigation
+│   │   │   ├── HelpGuideModal.jsx  # Contextual per-page user guide modal
 │   │   │   ├── ProtectedRoute.jsx  # Auth guard
 │   │   │   ├── RoleGuard.jsx       # Role-based guard
 │   │   │   ├── ToastContainer.jsx  # Global toast renderer
 │   │   │   └── FeatureDisabledBanner.jsx
 │   │   ├── hooks/
+│   │   │   ├── useApi.js           # Generic API hook
 │   │   │   └── useFeatureFlag.js   # Feature flag hook
 │   │   └── utils/
 │   │       └── axios.js            # Axios instance + interceptors
@@ -131,7 +147,9 @@ frontend/
 │       │   └── pages/LoginPage.jsx
 │       ├── dashboard/
 │       │   ├── api.js
-│       │   ├── pages/DashboardPage.jsx
+│       │   ├── pages/
+│       │   │   ├── DashboardPage.jsx       # Admin dashboard
+│       │   │   └── EmployeeHomePage.jsx    # Employee personal dashboard
 │       │   └── components/
 │       │       ├── StatCard.jsx
 │       │       └── DepartmentChart.jsx
@@ -150,6 +168,15 @@ frontend/
 │       │   └── pages/
 │       │       ├── LeaveListPage.jsx
 │       │       └── ApplyLeavePage.jsx
+│       ├── leave-types/
+│       │   ├── api.js
+│       │   └── pages/LeaveTypeListPage.jsx
+│       ├── leave-groups/
+│       │   ├── api.js
+│       │   └── pages/LeaveGroupListPage.jsx
+│       ├── holidays/
+│       │   ├── api.js
+│       │   └── pages/HolidayListPage.jsx
 │       ├── announcements/
 │       │   ├── api.js
 │       │   └── pages/AnnouncementsPage.jsx
