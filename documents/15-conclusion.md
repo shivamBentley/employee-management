@@ -16,10 +16,12 @@ The **Employee Management System (EMS)** has been successfully designed, develop
 | Dashboard analytics                | ✅     | Admin stats cards + charts; employee personal dashboard with heatmap |
 | Report generation                  | ✅     | PDF (DomPDF) and Excel (Maatwebsite)            |
 | Internal announcements             | ✅     | CRUD with real-time notification delivery       |
-| Database backup                    | ✅     | Spatie Backup with download capability          |
+| Database backup & restore          | ✅     | ZIP-based backup generation, download, and upload restore with confirmation |
 | Feature flag system                | ✅     | Settings-based toggle for modules               |
 | Toast notification system          | ✅     | Global Zustand-based toast notifications        |
 | Contextual help / user guide       | ✅     | Per-page HelpGuideModal with role-aware content |
+| Interactive product tour           | ✅     | driver.js guided tour, role-aware, replayable from navbar |
+| In-app release notes               | ✅     | Versioned changelog modal with unread badge via localStorage |
 | Country-specific holidays          | ✅     | Holiday CRUD with multi-country support         |
 
 The system demonstrates comprehensive software engineering skills including:
@@ -50,6 +52,7 @@ The following enhancements can be implemented in future versions:
 2. **Attendance System** — Clock-in / clock-out with daily attendance reports.
 3. **Payroll Integration** — Basic salary management linked to departments and attendance.
 4. **Document Upload** — Allow employees to upload ID proofs, certificates, etc.
+5. **Audit Trail** — Complete action logging for admin changes (who changed what and when).
 
 ### Medium-Term
 

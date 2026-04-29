@@ -128,5 +128,57 @@ class BackupController extends Controller
 
         return $sql;
     }
+
+    // ── Restore ────────────────────────────────────────────────────────────
+
+    public function restore(Request $request): JsonResponse
+    {
+        if (! $request->user()->isAdmin()) {
+            return response()->json(['message' => 'Forbidden'], 403);
+        }
+
+        $request->validate([
+            'file' => 'required|file|mimes:zip|max:51200', // 50 MB max
+        ]);
+
+        $uploaded = $request->file('file');
+
+        // Validate zip contains database.sql
+        $zip = new ZipArchive();
+        $tmpPath = $uploaded->getRealPath();
+
+        if ($zip->open($tmpPath) !== true) {
+            return response()->json(['message' => 'Invalid or corrupted zip file.'], 422);
+        }
+
+        $sqlContent = $zip->getFromName('database.sql');
+        $zip->close();
+
+        if ($sqlContent === false) {
+            return response()->json(['message' => 'Zip does not contain a valid database.sql file.'], 422);
+        }
+
+        try {
+            // Split on statement-ending semicolons followed by newline,
+            // filter empty lines and comments, then execute each statement.
+            DB::statement('SET FOREIGN_KEY_CHECKS=0');
+
+            $statements = preg_split('/;\s*\n/', $sqlContent);
+            foreach ($statements as $statement) {
+                $statement = trim($statement);
+                if ($statement === '' || str_starts_with($statement, '--')) {
+                    continue;
+                }
+                DB::unprepared($statement);
+            }
+
+            DB::statement('SET FOREIGN_KEY_CHECKS=1');
+
+            return response()->json(['message' => 'Database restored successfully.']);
+        } catch (\Throwable $e) {
+            DB::statement('SET FOREIGN_KEY_CHECKS=1');
+            return response()->json(['message' => 'Restore failed: ' . $e->getMessage()], 500);
+        }
+    }
 }
 

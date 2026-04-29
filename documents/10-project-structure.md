@@ -128,20 +128,23 @@ frontend/
 │   │   └── settingsStore.js    # Feature flag state
 │   ├── shared/
 │   │   ├── components/
-│   │   │   ├── AppLayout.jsx       # Main layout (sidebar + navbar)
-│   │   │   ├── Sidebar.jsx         # Navigation sidebar
-│   │   │   ├── Navbar.jsx          # Top navigation bar
-│   │   │   ├── Breadcrumb.jsx      # Breadcrumb navigation
-│   │   │   ├── HelpGuideModal.jsx  # Contextual per-page user guide modal
-│   │   │   ├── ProtectedRoute.jsx  # Auth guard
-│   │   │   ├── RoleGuard.jsx       # Role-based guard
-│   │   │   ├── ToastContainer.jsx  # Global toast renderer
+│   │   │   ├── AppLayout.jsx           # Main layout (sidebar + navbar)
+│   │   │   ├── Sidebar.jsx             # Navigation sidebar
+│   │   │   ├── Navbar.jsx              # Top navigation bar
+│   │   │   ├── Breadcrumb.jsx          # Breadcrumb navigation
+│   │   │   ├── HelpGuideModal.jsx      # Contextual per-page user guide modal
+│   │   │   ├── ReleaseNotesModal.jsx   # Versioned in-app changelog modal
+│   │   │   ├── ProtectedRoute.jsx      # Auth guard
+│   │   │   ├── RoleGuard.jsx           # Role-based guard
+│   │   │   ├── ToastContainer.jsx      # Global toast renderer
 │   │   │   └── FeatureDisabledBanner.jsx
 │   │   ├── hooks/
-│   │   │   ├── useApi.js           # Generic API hook
-│   │   │   └── useFeatureFlag.js   # Feature flag hook
+│   │   │   ├── useApi.js               # Generic API hook
+│   │   │   ├── useFeatureFlag.js       # Feature flag hook
+│   │   │   └── useTour.js              # driver.js product tour hook (role-aware)
 │   │   └── utils/
-│   │       └── axios.js            # Axios instance + interceptors
+│   │       ├── axios.js                # Axios instance + interceptors
+│   │       └── releaseNotes.js         # localStorage helpers for unseen release badge
 │   └── modules/
 │       ├── auth/
 │       │   └── pages/LoginPage.jsx

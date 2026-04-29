@@ -51,6 +51,8 @@ graph LR
 | **Lucide React**    | 1.8     | Icon library (tree-shakeable SVG icons)  |
 | **Headless UI**     | 2.2     | Accessible UI primitives                 |
 | **date-fns**        | 4.1     | Date formatting and manipulation         |
+| **driver.js**       | latest  | Interactive product tour / feature highlighting |
+| **react-is**        | 19.2    | React type checking (peer dep for Recharts) |
 
 ### Why These Choices?
 

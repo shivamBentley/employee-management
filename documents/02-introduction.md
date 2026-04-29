@@ -16,7 +16,7 @@ The system caters to two primary user roles:
 
 | Role       | Capabilities                                                                                         |
 | ---------- | ---------------------------------------------------------------------------------------------------- |
-| **Admin**  | Manage employees (CRUD), manage departments, approve/reject leaves, publish announcements, configure system settings, create database backups, view dashboard analytics, export reports (PDF/Excel) |
+| **Admin**  | Manage employees (CRUD), manage departments, approve/reject leaves, publish announcements, configure system settings, create and restore database backups, view dashboard analytics, export reports (PDF/Excel) |
 | **Employee** | View/edit own profile, apply for leaves, view announcements, update presence status, receive notifications |
 
 ## 2.4 Key Features
@@ -28,8 +28,10 @@ The system caters to two primary user roles:
 - **Announcements** — Publish organization-wide announcements with real-time notification delivery.
 - **Presence Tracking** — Employees set their online/away/offline/out-of-office status in real time via WebSockets.
 - **Notifications** — Real-time, in-app notification bell powered by Laravel Reverb (WebSocket).
-- **Backup & Restore** — One-click database backup with download capability.
+- **Backup & Restore** — One-click database backup generation, download, and full database restore via ZIP upload with confirmation guard.
 - **Feature Flags** — Admins can enable/disable modules (leave, announcements, presence, backup) from settings.
+- **Product Tour** — Guided interactive walkthrough of the portal, role-aware, powered by driver.js.
+- **Release Notes** — In-app versioned changelog accessible from the navbar with unread badge indicator.
 - **Containerized Deployment** — Entire stack runs via a single `docker compose up` command.
 
 ## 2.5 Users of the System
