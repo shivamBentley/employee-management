@@ -8,7 +8,7 @@ export default function NotificationBell() {
   const { notifications, unreadCount, handleMarkRead, handleMarkAllRead } = useNotifications();
 
   return (
-    <div className="relative">
+    <div id="notification-bell" className="relative">
       <button
         onClick={() => setOpen((o) => !o)}
         className="p-2 rounded-lg hover:bg-gray-100 relative"

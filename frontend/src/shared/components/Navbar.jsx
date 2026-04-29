@@ -1,10 +1,11 @@
 import { useState } from 'react';
-import { Menu, ChevronDown, HelpCircle } from 'lucide-react';
+import { Menu, ChevronDown, HelpCircle, Map } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import useAuthStore from '../../store/authStore';
 import StatusDropdown from '../../modules/presence/components/StatusDropdown';
 import NotificationBell from '../../modules/notifications/components/NotificationBell';
 import HelpGuideModal from './HelpGuideModal';
+import { useTour } from '../hooks/useTour';
 
 const PAGE_TITLES = {
   '/dashboard':     'Dashboard',
@@ -23,6 +24,7 @@ export default function Navbar({ onMenuClick }) {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const [helpOpen, setHelpOpen] = useState(false);
+  const { start: startTour } = useTour(user?.role);
 
   const pageTitle =
     PAGE_TITLES[pathname]
@@ -61,12 +63,23 @@ export default function Navbar({ onMenuClick }) {
         <NotificationBell />
 
         <button
+          id="help-guide-btn"
           onClick={() => setHelpOpen(true)}
           className="p-2 rounded-lg hover:bg-gray-100 transition"
           aria-label="Help & User Guide"
           title="Help & User Guide"
         >
           <HelpCircle size={20} className="text-gray-600" />
+        </button>
+
+        <button
+          id="tour-btn"
+          onClick={startTour}
+          className="p-2 rounded-lg hover:bg-gray-100 transition"
+          aria-label="Take a tour"
+          title="Take a Tour"
+        >
+          <Map size={20} className="text-gray-600" />
         </button>
 
         <HelpGuideModal open={helpOpen} onClose={() => setHelpOpen(false)} />

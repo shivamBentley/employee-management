@@ -28,7 +28,7 @@ export default function StatusDropdown() {
   };
 
   return (
-    <div className="relative">
+    <div id="status-dropdown" className="relative">
       <button
         onClick={() => setOpen((o) => !o)}
         className="flex items-center gap-1.5 text-sm text-gray-600 hover:text-gray-900 px-2 py-1 rounded-lg hover:bg-gray-100"

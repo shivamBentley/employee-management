@@ -60,7 +60,7 @@ export default function Sidebar({ open, onClose }) {
         `}
       >
         {/* Logo / brand */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-white/10">
+        <div id="sidebar-brand" className="flex items-center justify-between px-5 py-4 border-b border-white/10">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg bg-indigo-500 flex items-center justify-center">
               <span className="text-white font-bold text-sm">E</span>
@@ -80,7 +80,7 @@ export default function Sidebar({ open, onClose }) {
         </div>
 
         {/* Nav links */}
-        <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
+        <nav id="sidebar-nav" className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
           <p className="px-3 mb-2 text-[10px] font-semibold uppercase tracking-widest text-slate-500">
             Navigation
           </p>
@@ -105,7 +105,7 @@ export default function Sidebar({ open, onClose }) {
         </nav>
 
         {/* User footer */}
-        <div className="px-3 py-3 border-t border-white/10">
+        <div id="sidebar-user" className="px-3 py-3 border-t border-white/10">
           <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-white/5 mb-2">
             <div className="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center text-sm font-bold text-white flex-shrink-0">
               {user?.name?.[0]?.toUpperCase() || 'U'}
