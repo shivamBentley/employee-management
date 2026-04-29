@@ -1,10 +1,12 @@
 import { useState } from 'react';
-import { Menu, ChevronDown, HelpCircle, Map } from 'lucide-react';
+import { Menu, ChevronDown, HelpCircle, Map, Zap } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import useAuthStore from '../../store/authStore';
 import StatusDropdown from '../../modules/presence/components/StatusDropdown';
 import NotificationBell from '../../modules/notifications/components/NotificationBell';
 import HelpGuideModal from './HelpGuideModal';
+import ReleaseNotesModal from './ReleaseNotesModal';
+import { hasUnseenRelease, markReleaseSeen } from '../utils/releaseNotes';
 import { useTour } from '../hooks/useTour';
 
 const PAGE_TITLES = {
@@ -24,7 +26,15 @@ export default function Navbar({ onMenuClick }) {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const [helpOpen, setHelpOpen] = useState(false);
+  const [releaseOpen, setReleaseOpen] = useState(false);
+  const [unseen, setUnseen] = useState(() => hasUnseenRelease());
   const { start: startTour } = useTour(user?.role);
+
+  const handleReleaseOpen = () => {
+    setReleaseOpen(true);
+    setUnseen(false);
+    markReleaseSeen();
+  };
 
   const pageTitle =
     PAGE_TITLES[pathname]
@@ -63,6 +73,19 @@ export default function Navbar({ onMenuClick }) {
         <NotificationBell />
 
         <button
+          id="release-notes-btn"
+          onClick={handleReleaseOpen}
+          className="relative p-2 rounded-lg hover:bg-gray-100 transition"
+          aria-label="Release Notes"
+          title="What's New"
+        >
+          <Zap size={20} className="text-gray-600" />
+          {unseen && (
+            <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-red-500" />
+          )}
+        </button>
+
+        <button
           id="help-guide-btn"
           onClick={() => setHelpOpen(true)}
           className="p-2 rounded-lg hover:bg-gray-100 transition"
@@ -83,6 +106,7 @@ export default function Navbar({ onMenuClick }) {
         </button>
 
         <HelpGuideModal open={helpOpen} onClose={() => setHelpOpen(false)} />
+        <ReleaseNotesModal open={releaseOpen} onClose={() => setReleaseOpen(false)} />
 
         <div className="w-px h-6 bg-slate-200 mx-1 hidden sm:block" />
 
@@ -90,11 +114,11 @@ export default function Navbar({ onMenuClick }) {
           onClick={() => navigate('/profile')}
           className="flex items-center gap-2 pl-1 pr-2 py-1.5 rounded-xl hover:bg-slate-100 transition group"
         >
-          <div className="w-8 h-8 rounded-full overflow-hidden shadow-sm shrink-0">
+          <div className="w-8 h-8 rounded-full shrink-0 ring-2 ring-indigo-100 overflow-hidden">
             {user?.avatar ? (
               <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
             ) : (
-              <div className="w-full h-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-xs font-bold">
+              <div className="w-full h-full bg-indigo-600 flex items-center justify-center text-white text-xs font-bold">
                 {user?.name?.[0]?.toUpperCase() || 'U'}
               </div>
             )}
