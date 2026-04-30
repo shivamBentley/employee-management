@@ -1,17 +1,24 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
     public function up(): void
     {
-        DB::statement("ALTER TABLE `leaves` CHANGE `effective_days` `effective_hours` DECIMAL(6,1) NULL DEFAULT NULL");
+        Schema::table('leaves', function (Blueprint $table) {
+            if (!Schema::hasColumn('leaves', 'effective_hours')) {
+                $table->decimal('effective_hours', 6, 1)->nullable()->after('end_date');
+            }
+        });
     }
 
     public function down(): void
     {
-        DB::statement("ALTER TABLE `leaves` CHANGE `effective_hours` `effective_days` DECIMAL(6,1) NULL DEFAULT NULL");
+        Schema::table('leaves', function (Blueprint $table) {
+            $table->dropColumn('effective_hours');
+        });
     }
 };
