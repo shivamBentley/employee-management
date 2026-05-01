@@ -11,6 +11,8 @@ const FEATURE_KEYS = [
   { key: 'announcements_enabled',      label: 'Announcements',      description: 'Post company-wide announcements visible to all employees on their dashboard.' },
   { key: 'presence_tracking_enabled',  label: 'Presence Tracking',  description: 'Track employee clock-in/clock-out times and display daily presence status across the organisation.' },
   { key: 'backup_enabled',             label: 'Backup & Restore',   description: 'Enable scheduled database backups and allow admins to download or restore from previous snapshots.' },
+  { key: 'country_support_enabled',    label: 'Country Support',    description: 'Show country selection on employee profiles. When disabled, all employees default to India (IN) and country info is hidden across the application.' },
+  { key: 'leave_group_support_enabled', label: 'Leave Group Support', description: 'Allow employees to be assigned to specific leave groups with custom leave type allocations. When disabled, all employees use the default leave group and group selectors are hidden.' },
 ];
 
 export default function SettingsPage() {

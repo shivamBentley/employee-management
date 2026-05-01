@@ -64,6 +64,8 @@ A fullstack **Laravel 13 (REST API) + React 19 (SPA)** application with role-bas
 │   └── Dockerfile
 ├── docker-compose.yml
 └── Makefile          # All developer commands (macOS/Linux/WSL)
+├── start.ps1         # Windows PowerShell equivalent of make start
+└── clean-start.ps1   # Windows PowerShell equivalent of make clean-start
 ```
 
 ---
@@ -175,6 +177,21 @@ docker compose exec backend php artisan migrate --force
 docker compose exec backend bash
 ```
 
+**Option D — Use the included PowerShell scripts (no `make` needed)**
+
+The repo ships with `start.ps1` and `clean-start.ps1` that mirror `make start` / `make clean-start` exactly — they wait for the backend to be healthy and print the access info at the end.
+
+```powershell
+# Allow local scripts (run once in PowerShell as Administrator)
+Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
+
+# Normal start (build + start + wait for healthy)
+.\start.ps1
+
+# Full wipe + fresh start (stop, remove volumes, clear cache, rebuild)
+.\clean-start.ps1
+```
+
 ---
 
 ### What `make start` does
@@ -200,10 +217,11 @@ Log in with `admin@company.com` / `Admin@123`.
 
 | Command | Description |
 |---|---|
-| `make start` | Build + start everything (first-time and subsequent runs) |
+| `make start` | Build + start everything, waits for healthy, prints access info |
 | `make stop` | Stop all containers |
 | `make restart` | Stop then start |
 | `make rebuild` | Force-rebuild all images from scratch |
+| `make clean-start` | ⚠ Stop + wipe volumes & cache, rebuild, start fresh (images kept) |
 | `make logs` | Tail logs from all containers (Ctrl-C to exit) |
 | `make logs-backend` | Tail backend logs only |
 | `make logs-frontend` | Tail frontend logs only |
@@ -216,6 +234,8 @@ Log in with `admin@company.com` / `Admin@123`.
 | `make clean` | ⚠ Stop containers and remove all volumes (destroys DB) |
 | `make build-fe` | Rebuild frontend and hot-deploy to running Nginx container |
 | `make help` | List all available targets |
+
+> **Windows (no `make`):** use `.\.start.ps1` / `.\clean-start.ps1` — included in the repo root.
 
 ---
 

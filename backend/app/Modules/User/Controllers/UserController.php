@@ -73,6 +73,10 @@ class UserController extends Controller
 
     public function destroy(User $user): JsonResponse
     {
+        if ($user->role === 'admin') {
+            return response()->json(['message' => 'Admin accounts cannot be deleted.'], 403);
+        }
+
         $user->delete();
         return response()->json(['message' => 'Employee deleted']);
     }

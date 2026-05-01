@@ -36,14 +36,24 @@ This guide covers how to install and run the Employee Management System on **Win
 
 If you have **Docker Desktop** installed and running, the entire application can be set up with just **two commands**:
 
+**macOS / Linux:**
 ```bash
 git clone https://github.com/shivamBentley/employee-management.git
 cd employee-management && make start
 ```
 
-Or without `make`:
+**Windows (PowerShell — no `make` required):**
+```powershell
+git clone https://github.com/shivamBentley/employee-management.git
+cd employee-management
+.\start.ps1
+```
 
-```bash
+> If PowerShell blocks the script, run this once: `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`
+
+Or without any scripts at all:
+
+```powershell
 git clone https://github.com/shivamBentley/employee-management.git
 cd employee-management && docker compose up --build -d
 ```
@@ -106,6 +116,21 @@ cd employee-management
 docker compose up --build -d
 ```
 
+**Windows — Option D: PowerShell scripts (recommended — no `make` needed)**
+
+The repo ships with ready-made PowerShell scripts that mirror the `make` commands exactly — they check requirements, build, wait for the backend to become healthy, then print the access info.
+
+```powershell
+# Allow local scripts (run once in PowerShell as Administrator)
+Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
+
+# Normal start
+.\start.ps1
+
+# Full wipe + fresh start (removes volumes & cache, rebuilds)
+.\clean-start.ps1
+```
+
 **macOS / Linux:**
 
 ```bash
@@ -135,7 +160,7 @@ Wait 1–2 minutes for all containers to become healthy, then open:
 
 | Task                     | Windows (PowerShell)                                | macOS/Linux            |
 | ------------------------ | --------------------------------------------------- | ---------------------- |
-| Start all services       | `docker compose up --build -d`                      | `make start`           |
+| Start all services       | `.\start.ps1` or `docker compose up --build -d`     | `make start`           |
 | Stop all services        | `docker compose down`                               | `make stop`            |
 | View logs                | `docker compose logs -f`                            | `make logs`            |
 | Run migrations           | `docker compose exec backend php artisan migrate --force` | `make migrate`   |
@@ -143,6 +168,7 @@ Wait 1–2 minutes for all containers to become healthy, then open:
 | Reset database           | `docker compose exec backend php artisan migrate:fresh --seed` | `make fresh` |
 | Open backend shell       | `docker compose exec backend bash`                  | `make shell`           |
 | Stop & delete everything | `docker compose down -v`                            | `make clean`           |
+| Clean wipe + fresh start | `.\clean-start.ps1`                                 | `make clean-start`     |
 | Check container status   | `docker compose ps`                                 | `make status`          |
 
 ---

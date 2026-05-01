@@ -10,11 +10,13 @@ class SettingSeeder extends Seeder
     public function run(): void
     {
         $defaults = [
-            ['key' => 'leave_management_enabled',   'value' => '1', 'scope' => 'global'],
-            ['key' => 'announcements_enabled',       'value' => '1', 'scope' => 'global'],
-            ['key' => 'presence_tracking_enabled',   'value' => '1', 'scope' => 'global'],
-            ['key' => 'backup_enabled',              'value' => '1', 'scope' => 'admin'],
-            ['key' => 'holiday_management_enabled',   'value' => '1', 'scope' => 'global'],
+            ['key' => 'leave_management_enabled',    'value' => '1',  'scope' => 'global'],
+            ['key' => 'announcements_enabled',        'value' => '1',  'scope' => 'global'],
+            ['key' => 'presence_tracking_enabled',    'value' => '1',  'scope' => 'global'],
+            ['key' => 'backup_enabled',               'value' => '1',  'scope' => 'admin'],
+            ['key' => 'holiday_management_enabled',   'value' => '1',  'scope' => 'global'],
+            ['key' => 'country_support_enabled',      'value' => '0',  'scope' => 'global'],
+            ['key' => 'leave_group_support_enabled',  'value' => '0',  'scope' => 'global'],
         ];
 
         foreach ($defaults as $setting) {

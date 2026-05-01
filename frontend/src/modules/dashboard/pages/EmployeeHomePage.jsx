@@ -1,6 +1,7 @@
 import { useEffect, useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import useToastStore from '../../../store/toastStore';
+import useSettingsStore from '../../../store/settingsStore';
 import { getMe, getMyLeaveStats } from '../../employees/api';
 import { getLeaves } from '../../leaves/api';
 import { getHolidays } from '../../holidays/api';
@@ -39,6 +40,7 @@ const countryFlag = (code) => {
 };
 
 const MONTH_LABELS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const CURRENT_YEAR = new Date().getFullYear();
 const DAY_LABELS = ['Mon', '', 'Wed', '', 'Fri', '', ''];
 
 const STATUS_STYLES = {
@@ -88,24 +90,23 @@ function buildHeatmapData(year, leaves, holidays) {
   return map;
 }
 
-function getWeeksForYear(year) {
-  // Build a grid: 7 rows (Mon=0 … Sun=6) × N columns (weeks)
-  const weeks = [];
-  const jan1 = new Date(year, 0, 1);
-  // Adjust to start from the Monday of the week containing Jan 1
-  const startDow = jan1.getDay(); // 0=Sun
-  const mondayOffset = startDow === 0 ? -6 : 1 - startDow;
-  const startDate = new Date(year, 0, 1 + mondayOffset);
+function getWeeksForMonth(year, month) {
+  // month is 1-based; build Mon-Sun rows covering all days of that month
+  const firstDay = new Date(year, month - 1, 1);
+  const lastDay  = new Date(year, month, 0);
+  const dow = firstDay.getDay(); // 0=Sun
+  const startDate = new Date(firstDay);
+  startDate.setDate(firstDay.getDate() - (dow === 0 ? 6 : dow - 1));
 
+  const weeks = [];
   let current = new Date(startDate);
-  while (current.getFullYear() <= year) {
+  while (current <= lastDay) {
     const week = [];
     for (let d = 0; d < 7; d++) {
       week.push(new Date(current));
       current.setDate(current.getDate() + 1);
     }
     weeks.push(week);
-    if (current.getFullYear() > year && current.getMonth() > 0) break;
   }
   return weeks;
 }
@@ -121,51 +122,35 @@ const CELL_COLORS = {
   'out-of-year': 'bg-transparent',
 };
 
-function AttendanceHeatmap({ year, heatmapData }) {
+function AttendanceHeatmap({ year, month, heatmapData }) {
   const [tooltip, setTooltip] = useState(null);
-  const weeks = useMemo(() => getWeeksForYear(year), [year]);
+  const weeks = useMemo(() => getWeeksForMonth(year, month), [year, month]);
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  // Calculate month label positions
-  const monthPositions = useMemo(() => {
-    const positions = [];
-    let lastMonth = -1;
+  // Column date-labels (1, 8, 15, 22, 29)
+  const dateLabels = useMemo(() => {
+    const labels = [];
     weeks.forEach((week, wi) => {
-      const monthDay = week.find((d) => d.getFullYear() === year);
-      if (monthDay) {
-        const m = monthDay.getMonth();
-        if (m !== lastMonth) {
-          positions.push({ month: m, weekIdx: wi });
-          lastMonth = m;
-        }
+      const inMonth = week.find((d) => d.getMonth() === month - 1 && d.getFullYear() === year);
+      if (inMonth && (inMonth.getDate() === 1 || inMonth.getDate() % 7 === 1)) {
+        labels.push({ wi, day: inMonth.getDate() });
       }
     });
-    return positions;
-  }, [weeks, year]);
+    return labels;
+  }, [weeks, year, month]);
 
   return (
     <div className="space-y-2">
-      {/* Month labels */}
-      <div className="flex ml-8 text-[10px] text-gray-400 select-none">
-        {monthPositions.map(({ month, weekIdx }) => (
-          <span
-            key={month}
-            className="absolute"
-            style={{ marginLeft: `${weekIdx * 14}px` }}
-          >
-            {MONTH_LABELS[month]}
-          </span>
-        ))}
-      </div>
+      {/* Week-start day labels at the top */}
       <div className="flex ml-8 relative h-4">
-        {monthPositions.map(({ month, weekIdx }) => (
+        {dateLabels.map(({ wi, day }) => (
           <span
-            key={month}
+            key={wi}
             className="text-[10px] text-gray-400 absolute"
-            style={{ left: `${weekIdx * 14}px` }}
+            style={{ left: `${wi * 14}px` }}
           >
-            {MONTH_LABELS[month]}
+            {day}
           </span>
         ))}
       </div>
@@ -174,23 +159,23 @@ function AttendanceHeatmap({ year, heatmapData }) {
         {/* Day labels */}
         <div className="flex flex-col gap-[2px] mr-1 shrink-0">
           {DAY_LABELS.map((label, i) => (
-            <div key={i} className="h-[12px] w-6 text-[9px] text-gray-400 flex items-center justify-end pr-1 select-none">
+            <div key={i} className="h-[14px] w-6 text-[9px] text-gray-400 flex items-center justify-end pr-1 select-none">
               {label}
             </div>
           ))}
         </div>
 
         {/* Grid */}
-        <div className="flex gap-[2px] overflow-x-auto relative">
+        <div className="flex gap-[2px]">
           {weeks.map((week, wi) => (
             <div key={wi} className="flex flex-col gap-[2px]">
               {week.map((date, di) => {
                 const key = date.toISOString().slice(0, 10);
-                const inYear = date.getFullYear() === year;
+                const inMonth = date.getMonth() === month - 1 && date.getFullYear() === year;
                 const entry = heatmapData[key];
                 let cellType = 'out-of-year';
 
-                if (inYear) {
+                if (inMonth) {
                   if (entry) {
                     cellType = entry.type;
                   } else if (date > today) {
@@ -205,11 +190,11 @@ function AttendanceHeatmap({ year, heatmapData }) {
                 return (
                   <div
                     key={di}
-                    className={`w-[12px] h-[12px] rounded-[2px] ${CELL_COLORS[cellType] || 'bg-gray-50'} ${
+                    className={`w-[14px] h-[14px] rounded-[3px] ${CELL_COLORS[cellType] || 'bg-gray-50'} ${
                       isToday ? 'ring-1 ring-indigo-500 ring-offset-1' : ''
-                    } ${inYear ? 'cursor-pointer' : ''}`}
+                    } ${inMonth ? 'cursor-pointer' : ''}`}
                     onMouseEnter={(e) => {
-                      if (!inYear) return;
+                      if (!inMonth) return;
                       const rect = e.currentTarget.getBoundingClientRect();
                       setTooltip({
                         x: rect.left + rect.width / 2,
@@ -260,24 +245,40 @@ function AttendanceHeatmap({ year, heatmapData }) {
 
 export default function EmployeeHomePage() {
   const toast = useToastStore((s) => s.toast);
+  const settings = useSettingsStore((s) => s.settings);
+  const countryEnabled    = settings.country_support_enabled    !== '0';
+  const leaveGroupEnabled = settings.leave_group_support_enabled !== '0';
 
   const [profile, setProfile] = useState(null);
   const [leaveStats, setLeaveStats] = useState(null);
   const [upcomingHolidays, setUpcomingHolidays] = useState([]);
   const [recentLeaves, setRecentLeaves] = useState([]);
-  const [heatmapYear, setHeatmapYear] = useState(new Date().getFullYear());
   const [heatmapHolidays, setHeatmapHolidays] = useState({});
   const [heatmapLeaves, setHeatmapLeaves] = useState({});
   const [dismissedIds, setDismissedIds] = useState([]);
   const [loading, setLoading] = useState(true);
+  const now = new Date();
+  const [filterYear, setFilterYear] = useState(now.getFullYear());
+  const [filterMonth, setFilterMonth] = useState(now.getMonth() + 1);
+  const [statsLoading, setStatsLoading] = useState(false);
+  const yearOptions = Array.from({ length: 5 }, (_, i) => CURRENT_YEAR - i);
+
+  // Re-fetch leave stats when year/month filter changes
+  useEffect(() => {
+    let active = true;
+    getMyLeaveStats({ year: filterYear, month: filterMonth })
+      .then(({ data }) => { if (active) { setLeaveStats(data); setStatsLoading(false); } })
+      .catch(() => { if (active) setStatsLoading(false); });
+    return () => { active = false; };
+  }, [filterYear, filterMonth]);
 
   // Initial data load
   useEffect(() => {
-    const year = new Date().getFullYear();
+    const year = CURRENT_YEAR;
 
     Promise.all([
       getMe(),
-      getMyLeaveStats({ year }).catch(() => ({ data: null })),
+      getMyLeaveStats({ year, month: now.getMonth() + 1 }).catch(() => ({ data: null })),
       getHolidays({ year }).catch(() => ({ data: { holidays: [] } })),
       getLeaves({ per_page: 200 }).catch(() => ({ data: { data: [] } })),
     ])
@@ -312,31 +313,28 @@ export default function EmployeeHomePage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Fetch data when heatmap year changes
+  // Fetch heatmap data when filterYear changes (cached per year)
   useEffect(() => {
-    const currentYear = new Date().getFullYear();
-    if (heatmapYear === currentYear) return; // already loaded
-    if (heatmapHolidays[heatmapYear] && heatmapLeaves[heatmapYear]) return;
-
+    if (heatmapHolidays[filterYear] && heatmapLeaves[filterYear]) return;
     Promise.all([
-      getHolidays({ year: heatmapYear }).catch(() => ({ data: { holidays: [] } })),
-      getLeaves({ per_page: 200, year: heatmapYear }).catch(() => ({ data: { leaves: [] } })),
+      getHolidays({ year: filterYear }).catch(() => ({ data: { holidays: [] } })),
+      getLeaves({ per_page: 200, year: filterYear }).catch(() => ({ data: { leaves: [] } })),
     ]).then(([holidaysRes, leavesRes]) => {
       const holidays = Array.isArray(holidaysRes.data.holidays) ? holidaysRes.data.holidays : Array.isArray(holidaysRes.data) ? holidaysRes.data : [];
       const leaves = Array.isArray(leavesRes.data.leaves) ? leavesRes.data.leaves : Array.isArray(leavesRes.data.data) ? leavesRes.data.data : Array.isArray(leavesRes.data) ? leavesRes.data : [];
-      setHeatmapHolidays((prev) => ({ ...prev, [heatmapYear]: holidays }));
-      setHeatmapLeaves((prev) => ({ ...prev, [heatmapYear]: leaves }));
+      setHeatmapHolidays((prev) => ({ ...prev, [filterYear]: holidays }));
+      setHeatmapLeaves((prev) => ({ ...prev, [filterYear]: leaves }));
     });
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [heatmapYear]);
+  }, [filterYear]);
 
   const dismiss = (id) => {
     setDismissedIds((prev) => [...prev, id]);
   };
 
   const heatmapData = useMemo(
-    () => buildHeatmapData(heatmapYear, heatmapLeaves[heatmapYear] || [], heatmapHolidays[heatmapYear] || []),
-    [heatmapYear, heatmapLeaves, heatmapHolidays]
+    () => buildHeatmapData(filterYear, heatmapLeaves[filterYear] || [], heatmapHolidays[filterYear] || []),
+    [filterYear, heatmapLeaves, heatmapHolidays]
   );
 
   if (loading) {
@@ -360,7 +358,7 @@ export default function EmployeeHomePage() {
             </p>
             <p className="text-xs text-purple-600">
               {new Date(nextHoliday.date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
-              {nextHoliday.country && ` · ${countryFlag(nextHoliday.country)} ${nextHoliday.country}`}
+              {countryEnabled && nextHoliday.country && ` · ${countryFlag(nextHoliday.country)} ${nextHoliday.country}`}
             </p>
           </div>
           <Link to="/holidays" className="text-xs font-medium text-purple-600 hover:text-purple-800 shrink-0">
@@ -436,8 +434,12 @@ export default function EmployeeHomePage() {
               { Icon: Mail, label: 'Email', value: profile?.email },
               { Icon: Phone, label: 'Phone', value: profile?.phone || '—' },
               { Icon: Building2, label: 'Department', value: profile?.department?.name || '—' },
-              { Icon: MapPin, label: 'Location', value: profile?.country_code ? `${countryFlag(profile.country_code)} ${COUNTRY_NAMES[profile.country_code] || profile.country_code}` : '—' },
-              { Icon: Users, label: 'Leave Group', value: profile?.leave_group?.name || '—' },
+              ...(countryEnabled
+                ? [{ Icon: MapPin, label: 'Location', value: profile?.country_code ? `${countryFlag(profile.country_code)} ${COUNTRY_NAMES[profile.country_code] || profile.country_code}` : '—' }]
+                : []),
+              ...(leaveGroupEnabled
+                ? [{ Icon: Users, label: 'Leave Group', value: profile?.leave_group?.name || '—' }]
+                : []),
               { Icon: Briefcase, label: 'Role', value: profile?.role ? profile.role.charAt(0).toUpperCase() + profile.role.slice(1) : '—' },
             ].map(({ Icon, label, value }) => (
               <div key={label} className="flex items-center gap-3 bg-gray-50 rounded-xl px-3 py-2.5">
@@ -462,6 +464,46 @@ export default function EmployeeHomePage() {
       </div>
 
       {/* ===== LEAVE STATS CARDS ===== */}
+      {/* Period filter */}
+      <div className="flex flex-wrap items-center gap-2">
+        <button
+          onClick={() => setFilterYear((y) => y - 1)}
+          className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500 transition"
+        >
+          <ChevronLeft size={15} />
+        </button>
+        <select
+          value={filterYear}
+          onChange={(e) => setFilterYear(Number(e.target.value))}
+          className="border rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        >
+          {yearOptions.map((y) => <option key={y} value={y}>{y}</option>)}
+        </select>
+        <button
+          onClick={() => setFilterYear((y) => Math.min(y + 1, CURRENT_YEAR))}
+          disabled={filterYear >= CURRENT_YEAR}
+          className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500 transition disabled:opacity-30"
+        >
+          <ChevronRight size={15} />
+        </button>
+        <div className="flex gap-1 flex-wrap">
+          {MONTH_LABELS.map((m, i) => (
+            <button
+              key={m}
+              onClick={() => setFilterMonth(i + 1)}
+              className={`px-2.5 py-1 rounded-lg text-xs font-medium transition ${
+                filterMonth === i + 1
+                  ? 'bg-indigo-600 text-white'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              {m}
+            </button>
+          ))}
+        </div>
+        {statsLoading && <span className="text-xs text-gray-400">Updating…</span>}
+      </div>
+
       {leaveStats && (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
           {[
@@ -515,7 +557,7 @@ export default function EmployeeHomePage() {
                       <p className="text-sm font-medium text-gray-800 truncate">{h.name}</p>
                       <p className="text-xs text-gray-400">{dateStr}{h.description ? ` · ${h.description}` : ''}</p>
                     </div>
-                    {h.country && (
+                    {countryEnabled && h.country && (
                       <span className="text-xs text-gray-400 shrink-0">{countryFlag(h.country)}</span>
                     )}
                   </div>
@@ -534,7 +576,7 @@ export default function EmployeeHomePage() {
         {leaveStats?.balances?.length > 0 && (
           <div className="bg-white rounded-2xl border border-gray-100 p-5 space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-semibold text-gray-800">Leave Balances — {leaveStats.year}</h3>
+              <h3 className="text-sm font-semibold text-gray-800">Leave Balances — {MONTH_LABELS[filterMonth - 1]} {filterYear}</h3>
               <p className="text-xs text-gray-400">{leaveStats.total_requests} req · {leaveStats.approved_count} approved</p>
             </div>
             <div className="space-y-3">
@@ -565,30 +607,12 @@ export default function EmployeeHomePage() {
         )}
       </div>
 
-      {/* ===== YEARLY ATTENDANCE HEATMAP ===== */}
+      {/* ===== MONTHLY ATTENDANCE HEATMAP ===== */}
       <div className="bg-white rounded-2xl border border-gray-100 p-5 space-y-3">
-        <div className="flex items-center justify-between">
-          <h3 className="text-sm font-semibold text-gray-800">Attendance Overview</h3>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setHeatmapYear((y) => y - 1)}
-              className="p-1 rounded-md hover:bg-gray-100 text-gray-500 transition"
-            >
-              <ChevronLeft size={16} />
-            </button>
-            <span className="text-sm font-semibold text-gray-700 w-12 text-center">{heatmapYear}</span>
-            <button
-              onClick={() => setHeatmapYear((y) => Math.min(y + 1, new Date().getFullYear()))}
-              disabled={heatmapYear >= new Date().getFullYear()}
-              className="p-1 rounded-md hover:bg-gray-100 text-gray-500 transition disabled:opacity-30"
-            >
-              <ChevronRight size={16} />
-            </button>
-          </div>
-        </div>
-        <div className="overflow-x-auto">
-          <AttendanceHeatmap year={heatmapYear} heatmapData={heatmapData} />
-        </div>
+        <h3 className="text-sm font-semibold text-gray-800">
+          Attendance — {MONTH_LABELS[filterMonth - 1]} {filterYear}
+        </h3>
+        <AttendanceHeatmap year={filterYear} month={filterMonth} heatmapData={heatmapData} />
       </div>
 
       {/* ===== QUICK LINKS ===== */}

@@ -17,27 +17,46 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class DashboardController extends Controller
 {
-    public function stats(): JsonResponse
+    public function stats(Request $request): JsonResponse
     {
         $today = Carbon::today();
+        $year  = (int) $request->input('year', now()->year);
+        $month = $request->input('month') ? (int) $request->input('month') : null;
 
-        $totalEmployees = User::where('role', 'employee')->count();
+        $totalEmployees  = User::where('role', 'employee')->count();
         $activeEmployees = User::where('role', 'employee')->where('is_active', true)->count();
 
-        $onLeaveToday = Leave::whereDate('start_date', '<=', $today)
-            ->whereDate('end_date', '>=', $today)
-            ->where('status', 'approved')
-            ->count();
+        // On-leave count: today if no period filter, otherwise count for the selected month
+        if ($month) {
+            $periodStart = Carbon::create($year, $month, 1)->startOfMonth();
+            $periodEnd   = Carbon::create($year, $month, 1)->endOfMonth();
+            $onLeaveToday = Leave::whereDate('start_date', '<=', $periodEnd)
+                ->whereDate('end_date', '>=', $periodStart)
+                ->where('status', 'approved')
+                ->count();
+        } else {
+            $onLeaveToday = Leave::whereDate('start_date', '<=', $today)
+                ->whereDate('end_date', '>=', $today)
+                ->where('status', 'approved')
+                ->count();
+        }
 
-        $pendingLeaves = Leave::where('status', 'pending')->count();
+        // Pending leaves filtered to selected period
+        $pendingQuery = Leave::where('status', 'pending')->whereYear('start_date', $year);
+        if ($month) {
+            $pendingQuery->whereMonth('start_date', $month);
+        }
+        $pendingLeaves = $pendingQuery->count();
 
         $departmentStats = Department::withCount('users')->get()
             ->map(fn($d) => ['name' => $d->name, 'count' => $d->users_count]);
 
-        $leaveStats = Leave::selectRaw('status, COUNT(*) as count')
-            ->groupBy('status')
-            ->get()
-            ->pluck('count', 'status');
+        $leaveStatsQuery = Leave::selectRaw('status, COUNT(*) as count')
+            ->whereYear('start_date', $year);
+        if ($month) {
+            $leaveStatsQuery->whereMonth('start_date', $month);
+        }
+        $leaveStats = $leaveStatsQuery->groupBy('status')->get()->pluck('count', 'status');
 
         return response()->json([
             'total_employees'  => $totalEmployees,
@@ -46,13 +65,15 @@ class DashboardController extends Controller
             'pending_leaves'   => $pendingLeaves,
             'department_stats' => $departmentStats,
             'leave_stats'      => $leaveStats,
+            'filter'           => ['year' => $year, 'month' => $month],
         ]);
     }
 
     public function leaveSummary(Request $request): JsonResponse
     {
-        $user = $request->user();
-        $year = (int) $request->input('year', now()->year);
+        $user  = $request->user();
+        $year  = (int) $request->input('year', now()->year);
+        $month = $request->input('month') ? (int) $request->input('month') : null;
         $today = Carbon::today();
 
         // User's leave balances for the year
@@ -69,11 +90,14 @@ class DashboardController extends Controller
             ->orderBy('start_date')
             ->first();
 
-        // Monthly usage for the year
-        $monthlyUsage = Leave::where('user_id', $user->id)
+        // Monthly usage for the year (or specific month)
+        $usageQuery = Leave::where('user_id', $user->id)
             ->where('status', 'approved')
-            ->whereYear('start_date', $year)
-            ->get()
+            ->whereYear('start_date', $year);
+        if ($month) {
+            $usageQuery->whereMonth('start_date', $month);
+        }
+        $monthlyUsage = $usageQuery->get()
             ->groupBy(fn($l) => $l->start_date->month)
             ->map(fn($leaves) => [
                 'count' => $leaves->count(),
@@ -91,6 +115,7 @@ class DashboardController extends Controller
             ] : null,
             'monthly_usage' => $monthlyUsage,
             'year'          => $year,
+            'month'         => $month,
         ];
 
         // Admin gets additional org-wide stats

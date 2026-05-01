@@ -4,6 +4,7 @@ import { getEmployee, updateEmployee, getMe, updateMe, changePassword, getMyLeav
 import { getDepartments } from '../../departments/api';
 import useAuthStore from '../../../store/authStore';
 import useToastStore from '../../../store/toastStore';
+import useSettingsStore from '../../../store/settingsStore';
 import { Camera, Clock, CheckCircle, XCircle, AlertCircle, Calendar, Briefcase, GraduationCap, MapPin, Wrench, Users, Link2, Phone, Shield, Plus, Trash2 } from 'lucide-react';
 
 const DEFAULT_AVATAR = 'https://ui-avatars.com/api/?background=6366f1&color=fff&bold=true&size=128';
@@ -42,6 +43,9 @@ export default function EmployeeProfilePage() {
   const { user: authUser, setUser } = useAuthStore();
   const isOwn = !id;
   const isAdmin = authUser?.role === 'admin';
+  const settings = useSettingsStore((s) => s.settings);
+  const countryEnabled    = settings.country_support_enabled    !== '0';
+  const leaveGroupEnabled = settings.leave_group_support_enabled !== '0';
 
   const [form, setForm] = useState({
     name: '', phone: '', bio: '', position: '', country_code: 'IN', department_id: '',
@@ -190,12 +194,12 @@ export default function EmployeeProfilePage() {
             <div className="flex flex-wrap items-center gap-3 mt-2 justify-center sm:justify-start text-xs text-gray-500">
               {profileData?.position && <span className="bg-gray-100 px-2 py-0.5 rounded-full">{profileData.position}</span>}
               {profileData?.department?.name && <span className="bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full">{profileData.department.name}</span>}
-              {profileData?.country_code && (
+              {profileData?.country_code && countryEnabled && (
                 <span className="bg-gray-100 px-2 py-0.5 rounded-full">
                   {countryFlag(profileData.country_code)} {COUNTRY_NAMES[profileData.country_code] || profileData.country_code}
                 </span>
               )}
-              {profileData?.leave_group?.name && (
+              {profileData?.leave_group?.name && leaveGroupEnabled && (
                 <span className="bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded-full">Group: {profileData.leave_group.name}</span>
               )}
               <span className={`px-2 py-0.5 rounded-full font-medium ${profileData?.role === 'admin' ? 'bg-amber-100 text-amber-700' : 'bg-green-50 text-green-700'}`}>
@@ -450,18 +454,20 @@ export default function EmployeeProfilePage() {
             </div>
           </div>
 
-          <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">Country</label>
-            <select
-              value={form.country_code}
-              onChange={(e) => setForm((f) => ({ ...f, country_code: e.target.value }))}
-              className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            >
-              {Object.entries(COUNTRY_NAMES).map(([code, name]) => (
-                <option key={code} value={code}>{countryFlag(code)} {name}</option>
-              ))}
-            </select>
-          </div>
+          {countryEnabled && (
+            <div>
+              <label className="block text-xs font-medium text-gray-600 mb-1">Country</label>
+              <select
+                value={form.country_code}
+                onChange={(e) => setForm((f) => ({ ...f, country_code: e.target.value }))}
+                className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              >
+                {Object.entries(COUNTRY_NAMES).map(([code, name]) => (
+                  <option key={code} value={code}>{countryFlag(code)} {name}</option>
+                ))}
+              </select>
+            </div>
+          )}
 
           {isAdmin && (
             <div>

@@ -58,7 +58,7 @@ Two roles with distinct access levels:
 | ----------------- | --------------------------- | ---------------------------- |
 | Dashboard         | ❌ No access                | ✅ Full access               |
 | Own profile       | ✅ View & edit              | ✅ View & edit               |
-| Other employees   | ❌ No access                | ✅ Full CRUD                 |
+| Other employees   | ❌ No access                | ✅ Full CRUD (admin accounts cannot be deleted) |
 | Departments       | ❌ No access                | ✅ Full CRUD                 |
 | Leave (own)       | ✅ Apply & cancel           | ✅ Apply & cancel            |
 | Leave (others)    | ❌ No access                | ✅ Approve & reject          |

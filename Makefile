@@ -5,18 +5,19 @@ COMPOSE := docker compose
 #  Employee Management System — Makefile
 #
 #  Usage:
-#    make start      → check requirements, build images, start all services
-#    make stop       → stop all running containers
-#    make restart    → stop then start
-#    make rebuild    → force rebuild images and restart
-#    make logs       → tail logs from all containers
-#    make shell      → open a bash shell inside the backend container
-#    make migrate    → run migrations manually
-#    make seed       → run database seeders manually
-#    make fresh      → drop all tables, re-migrate and seed (⚠ destructive)
-#    make clean      → stop containers and remove volumes (⚠ destructive)
-#    make status     → show container health status
-#    make help       → show this help
+#    make start       → check requirements, build images, start all services
+#    make stop        → stop all running containers
+#    make restart     → stop then start
+#    make rebuild     → force rebuild images and restart
+#    make clean-start → stop, wipe volumes & cache, rebuild, start fresh (keeps images)
+#    make logs        → tail logs from all containers
+#    make shell       → open a bash shell inside the backend container
+#    make migrate     → run migrations manually
+#    make seed        → run database seeders manually
+#    make fresh       → drop all tables, re-migrate and seed (⚠ destructive)
+#    make clean       → stop containers and remove volumes (⚠ destructive)
+#    make status      → show container health status
+#    make help        → show this help
 # ─────────────────────────────────────────────────────────────────────────────
 
 ##@ Requirements check
@@ -44,14 +45,20 @@ check-requirements:
 
 .PHONY: start
 start: check-requirements   ## ★ Check requirements → build → start everything (first-time & subsequent)
+	@echo ""
 	@echo "════════════════════════════════════════════════"
 	@echo "  Building and starting Employee Management System"
+	@echo "  (equivalent to: docker compose up --build -d)"
 	@echo "════════════════════════════════════════════════"
 	$(COMPOSE) up --build -d
 	@echo ""
+	@echo "  Waiting for backend to become healthy..."
+	@until [ "$$(docker inspect --format='{{.State.Health.Status}}' ems_backend 2>/dev/null)" = "healthy" ]; do \
+		printf '.'; sleep 2; \
+	done
+	@echo ""
 	@echo "════════════════════════════════════════════════"
-	@echo "  Services are starting up."
-	@echo "  Tip: run 'make logs' to watch live output."
+	@echo "  ✓  All services are up and healthy!"
 	@echo ""
 	@echo "  Frontend  →  http://localhost:3000"
 	@echo "  Backend   →  http://localhost:8000"
@@ -60,6 +67,8 @@ start: check-requirements   ## ★ Check requirements → build → start everyt
 	@echo "  Default login:"
 	@echo "    Email:    admin@company.com"
 	@echo "    Password: Admin@123"
+	@echo ""
+	@echo "  Tip: run 'make logs' to watch live output."
 	@echo "════════════════════════════════════════════════"
 
 .PHONY: stop
@@ -135,6 +144,44 @@ clean:   ## ⚠ Stop containers AND remove all named volumes (destroys database)
 	@sleep 5
 	$(COMPOSE) down -v
 	@echo "  ✓  Containers and volumes removed."
+
+.PHONY: clean-start
+clean-start: check-requirements   ## ⚠ Stop containers, wipe volumes & cache, rebuild and start fresh (images kept)
+	@echo ""
+	@echo "════════════════════════════════════════════════"
+	@echo "  Clean-start: stopping containers..."
+	@echo "════════════════════════════════════════════════"
+	$(COMPOSE) down -v --remove-orphans
+	@echo "  ✓  Containers and volumes removed."
+	@echo ""
+	@echo "  Pruning dangling build cache (not images)..."
+	docker builder prune -f
+	@echo "  ✓  Build cache cleared."
+	@echo ""
+	@echo "  Removing backend framework cache..."
+	@rm -rf backend/bootstrap/cache/*.php || true
+	@echo "  ✓  Laravel bootstrap cache cleared."
+	@echo ""
+	@echo "  Rebuilding and starting services..."
+	@echo "════════════════════════════════════════════════"
+	$(COMPOSE) up --build -d
+	@echo ""
+	@echo "  Waiting for backend to become healthy..."
+	@until [ "$$(docker inspect --format='{{.State.Health.Status}}' ems_backend 2>/dev/null)" = "healthy" ]; do \
+		printf '.'; sleep 2; \
+	done
+	@echo ""
+	@echo "════════════════════════════════════════════════"
+	@echo "  ✓  All services are up and healthy!"
+	@echo ""
+	@echo "  Frontend  →  http://localhost:3000"
+	@echo "  Backend   →  http://localhost:8000"
+	@echo "  WebSocket →  ws://localhost:8080"
+	@echo ""
+	@echo "  Default login:"
+	@echo "    Email:    admin@company.com"
+	@echo "    Password: Admin@123"
+	@echo "════════════════════════════════════════════════"
 
 ##@ Help
 

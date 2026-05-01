@@ -21,15 +21,15 @@ The system caters to two primary user roles:
 
 ## 2.4 Key Features
 
-- **Dashboard & Analytics** — Real-time stats with chart visualizations (total employees, on-leave today, pending requests, per-department distribution).
-- **Employee Management** — Full CRUD with avatar upload, department assignment, search/sort/filter.
+- **Dashboard & Analytics** — Real-time stats with chart visualizations (total employees, on-leave today, pending requests, per-department distribution). Year/month period picker lets admins drill into any month's data.
+- **Employee Management** — Full CRUD with avatar upload, department assignment, search/sort/filter. System admin account is protected from deletion.
 - **Department Management** — Create, rename, delete departments with live member counts.
 - **Leave Management** — Apply for casual, sick, annual, or WFH leave; admin approval/rejection workflow.
 - **Announcements** — Publish organization-wide announcements with real-time notification delivery.
 - **Presence Tracking** — Employees set their online/away/offline/out-of-office status in real time via WebSockets.
 - **Notifications** — Real-time, in-app notification bell powered by Laravel Reverb (WebSocket).
 - **Backup & Restore** — One-click database backup generation, download, and full database restore via ZIP upload with confirmation guard.
-- **Feature Flags** — Admins can enable/disable modules (leave, announcements, presence, backup) from settings.
+- **Feature Flags** — Admins can enable/disable modules (leave, announcements, presence, backup, country support, leave group support) from settings. Country and leave group features are off by default.
 - **Product Tour** — Guided interactive walkthrough of the portal, role-aware, powered by driver.js.
 - **Release Notes** — In-app versioned changelog accessible from the navbar with unread badge indicator.
 - **Containerized Deployment** — Entire stack runs via a single `docker compose up` command.

@@ -5,6 +5,7 @@ import StatusBadge from '../../presence/components/StatusBadge';
 import { Pencil, Trash2, Plus, Search, ChevronUp, ChevronDown, Eye } from 'lucide-react';
 import CreateEmployeeModal from '../components/CreateEmployeeModal';
 import useToastStore from '../../../store/toastStore';
+import useSettingsStore from '../../../store/settingsStore';
 
 function SortIcon({ field, sortKey, sortDir }) {
   if (sortKey !== field) return <ChevronUp size={11} className="text-gray-300 inline ml-0.5" />;
@@ -36,6 +37,9 @@ export default function EmployeeListPage() {
   const [sortKey, setSortKey] = useState('name');
   const [sortDir, setSortDir] = useState('asc');
   const toast = useToastStore((s) => s.toast);
+  const settings = useSettingsStore((s) => s.settings);
+  const countryEnabled    = settings.country_support_enabled    !== '0';
+  const leaveGroupEnabled = settings.leave_group_support_enabled !== '0';
 
   const load = () => {
     setLoading(true);
@@ -95,8 +99,8 @@ export default function EmployeeListPage() {
     { key: null,         label: 'Email' },
     { key: 'department', label: 'Department' },
     { key: 'position',   label: 'Position' },
-    { key: 'country',    label: 'Country' },
-    { key: 'group',      label: 'Leave Group' },
+    ...(countryEnabled    ? [{ key: 'country', label: 'Country' }]    : []),
+    ...(leaveGroupEnabled ? [{ key: 'group',   label: 'Leave Group' }] : []),
     { key: 'status',     label: 'Status' },
     { key: null,         label: 'Actions' },
   ];
@@ -189,21 +193,27 @@ export default function EmployeeListPage() {
                   <td className="px-4 py-3 text-gray-500 truncate max-w-[180px]">{emp.email}</td>
                   <td className="px-4 py-3 text-gray-500 whitespace-nowrap">{emp.department?.name || '—'}</td>
                   <td className="px-4 py-3 text-gray-500 whitespace-nowrap">{emp.position || '—'}</td>
-                  <td className="px-4 py-3 text-gray-500 whitespace-nowrap">
-                    {emp.country_code ? (
-                      <span title={COUNTRY_NAMES[emp.country_code] || emp.country_code}>
-                        <span className="text-base mr-1">{countryFlag(emp.country_code)}</span>
-                        {emp.country_code}
-                      </span>
-                    ) : '—'}
-                  </td>
-                  <td className="px-4 py-3 text-gray-500 whitespace-nowrap text-xs">{emp.leave_group?.name || '—'}</td>
+                  {countryEnabled && (
+                    <td className="px-4 py-3 text-gray-500 whitespace-nowrap">
+                      {emp.country_code ? (
+                        <span title={COUNTRY_NAMES[emp.country_code] || emp.country_code}>
+                          <span className="text-base mr-1">{countryFlag(emp.country_code)}</span>
+                          {emp.country_code}
+                        </span>
+                      ) : '—'}
+                    </td>
+                  )}
+                  {leaveGroupEnabled && (
+                    <td className="px-4 py-3 text-gray-500 whitespace-nowrap text-xs">{emp.leave_group?.name || '—'}</td>
+                  )}
                   <td className="px-4 py-3"><StatusBadge status={emp.presence?.status ?? 'offline'} showLabel /></td>
                   <td className="px-4 py-3">
                     <div className="flex gap-1">
                       <Link to={`/employees/${emp.id}`} className="p-1.5 rounded hover:bg-indigo-50 text-indigo-600" title="View Profile"><Eye size={14} /></Link>
                       <Link to={`/employees/${emp.id}`} className="p-1.5 rounded hover:bg-blue-50 text-blue-600" title="Edit"><Pencil size={14} /></Link>
-                      <button onClick={() => handleDelete(emp.id, emp.name)} className="p-1.5 rounded hover:bg-red-50 text-red-500" title="Delete"><Trash2 size={14} /></button>
+                      {emp.role !== 'admin' && (
+                        <button onClick={() => handleDelete(emp.id, emp.name)} className="p-1.5 rounded hover:bg-red-50 text-red-500" title="Delete"><Trash2 size={14} /></button>
+                      )}
                     </div>
                   </td>
                 </tr>

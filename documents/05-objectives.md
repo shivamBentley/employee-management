@@ -23,7 +23,7 @@
 ## 5.2 Secondary Objectives
 
 7. **Dashboard Analytics**
-   Provide admin users with real-time statistics — total employees, active count, on-leave today, pending requests — with a department distribution chart. Provide employees with a personal home dashboard featuring profile summary, leave heatmap, and upcoming holidays.
+   Provide admin users with real-time statistics — total employees, active count, on-leave today, pending requests — with a department distribution chart and a year/month period picker to drill into historical data. Provide employees with a personal home dashboard featuring profile summary, leave balance cards (month-filtered), attendance heatmap (month-filtered), and upcoming holidays.
 
 8. **Report Generation**
    Enable PDF and Excel export of employee/department reports for offline use and management meetings.
@@ -35,7 +35,7 @@
     Provide a one-click database backup mechanism with downloadable backup files.
 
 11. **Feature Flag System**
-    Allow admins to toggle modules (leave management, announcements, presence tracking, backups) on or off from a settings panel.
+    Allow admins to toggle modules (leave management, announcements, presence tracking, backups, country support, leave group support) on or off from a settings panel. Country support and leave group support are disabled by default; when disabled all country and group UI is hidden across the application.
 
 12. **Toast Notification System**
     Provide user-friendly success/error/warning feedback for every action using a global toast notification system.

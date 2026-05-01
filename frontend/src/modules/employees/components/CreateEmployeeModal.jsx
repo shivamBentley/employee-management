@@ -4,6 +4,7 @@ import { getDepartments } from '../../departments/api';
 import { getLeaveGroups } from '../../leave-groups/api';
 import { X } from 'lucide-react';
 import useToastStore from '../../../store/toastStore';
+import useSettingsStore from '../../../store/settingsStore';
 
 const COUNTRIES = [
   { code: 'IN', name: 'India' },
@@ -19,6 +20,9 @@ const COUNTRIES = [
 ];
 
 export default function CreateEmployeeModal({ onClose, onCreated }) {
+  const settings = useSettingsStore((s) => s.settings);
+  const countryEnabled   = settings.country_support_enabled    !== '0';
+  const leaveGroupEnabled = settings.leave_group_support_enabled !== '0';
   const [form, setForm] = useState({
     name: '', email: '', password: '', role: 'employee', position: '',
     department_id: '', country_code: 'IN', leave_group_id: '',
@@ -123,12 +127,14 @@ export default function CreateEmployeeModal({ onClose, onCreated }) {
           </div>
 
           <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">Country <span className="text-red-400">*</span></label>
-              <select required value={form.country_code} onChange={(e) => setForm((f) => ({ ...f, country_code: e.target.value }))} className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                {COUNTRIES.map((c) => <option key={c.code} value={c.code}>{c.name}</option>)}
-              </select>
-            </div>
+            {countryEnabled && (
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">Country <span className="text-red-400">*</span></label>
+                <select required value={form.country_code} onChange={(e) => setForm((f) => ({ ...f, country_code: e.target.value }))} className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                  {COUNTRIES.map((c) => <option key={c.code} value={c.code}>{c.name}</option>)}
+                </select>
+              </div>
+            )}
             <div>
               <label className="block text-xs font-medium text-gray-600 mb-1">Role</label>
               <select value={form.role} onChange={(e) => setForm((f) => ({ ...f, role: e.target.value }))} className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none">
@@ -138,13 +144,15 @@ export default function CreateEmployeeModal({ onClose, onCreated }) {
             </div>
           </div>
 
-          <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">Leave Group</label>
-            <select value={form.leave_group_id} onChange={(e) => setForm((f) => ({ ...f, leave_group_id: e.target.value }))} className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-              <option value="">— Default group —</option>
-              {leaveGroups.map((g) => <option key={g.id} value={g.id}>{g.name}{g.is_default ? ' (Default)' : ''}</option>)}
-            </select>
-          </div>
+          {leaveGroupEnabled && (
+            <div>
+              <label className="block text-xs font-medium text-gray-600 mb-1">Leave Group</label>
+              <select value={form.leave_group_id} onChange={(e) => setForm((f) => ({ ...f, leave_group_id: e.target.value }))} className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="">— Default group —</option>
+                {leaveGroups.map((g) => <option key={g.id} value={g.id}>{g.name}{g.is_default ? ' (Default)' : ''}</option>)}
+              </select>
+            </div>
+          )}
 
           {/* Compensation */}
           <p className="text-[10px] font-semibold uppercase tracking-widest text-gray-400 pt-2">Compensation</p>

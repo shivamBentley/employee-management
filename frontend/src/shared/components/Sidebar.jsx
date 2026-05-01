@@ -1,6 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import useAuthStore from '../../store/authStore';
+import useSettingsStore from '../../store/settingsStore';
 import {
   LayoutDashboard,
   Users,
@@ -40,7 +41,14 @@ export default function Sidebar({ open, onClose }) {
   const { user, clearAuth } = useAuthStore();
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const nav = user?.role === 'admin' ? adminNav : employeeNav;
+  const settings = useSettingsStore((s) => s.settings);
+  const leaveGroupEnabled = settings.leave_group_support_enabled !== '0';
+
+  const baseAdminNav = leaveGroupEnabled
+    ? adminNav
+    : adminNav.filter((item) => item.to !== '/leave-groups');
+
+  const nav = user?.role === 'admin' ? baseAdminNav : employeeNav;
 
   const handleLogout = () => {
     clearAuth();

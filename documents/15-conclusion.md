@@ -10,14 +10,14 @@ The **Employee Management System (EMS)** has been successfully designed, develop
 | Automated leave workflow           | ✅     | Apply → Approve/Reject pipeline with notifications |
 | Advanced leave management          | ✅     | Configurable leave types, groups, balances, and holiday calendar |
 | Real-time presence tracking        | ✅     | Laravel Reverb WebSocket broadcasting          |
-| Role-based access control          | ✅     | Sanctum tokens + admin/employee roles          |
+| Role-based access control          | ✅     | Sanctum tokens + admin/employee roles; admin accounts protected from deletion |
 | Responsive modern UI               | ✅     | React SPA with Tailwind CSS                    |
 | Containerized deployment           | ✅     | Docker Compose with 3 containers               |
-| Dashboard analytics                | ✅     | Admin stats cards + charts; employee personal dashboard with heatmap |
+| Dashboard analytics                | ✅     | Admin stats cards + charts with year/month filter; employee personal dashboard with month-filtered leave stats and attendance heatmap |
 | Report generation                  | ✅     | PDF (DomPDF) and Excel (Maatwebsite)            |
 | Internal announcements             | ✅     | CRUD with real-time notification delivery       |
 | Database backup & restore          | ✅     | ZIP-based backup generation, download, and upload restore with confirmation |
-| Feature flag system                | ✅     | Settings-based toggle for modules               |
+| Feature flag system                | ✅     | Settings-based toggle for modules (leave, announcements, presence, backup, country support, leave group support); country & leave group off by default |
 | Toast notification system          | ✅     | Global Zustand-based toast notifications        |
 | Contextual help / user guide       | ✅     | Per-page HelpGuideModal with role-aware content |
 | Interactive product tour           | ✅     | driver.js guided tour, role-aware, replayable from navbar |

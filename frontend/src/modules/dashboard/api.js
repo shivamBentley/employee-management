@@ -1,6 +1,6 @@
 import api from '../../shared/utils/axios';
 
-export const getStats = () => api.get('/dashboard/stats');
+export const getStats = (params) => api.get('/dashboard/stats', { params });
 export const downloadPdf = () => api.get('/reports/pdf', { responseType: 'blob' });
 export const downloadExcel = () => api.get('/reports/excel', { responseType: 'blob' });
 export const seedDemoData = () => api.post('/demo/seed');
