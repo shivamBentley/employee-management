@@ -20,6 +20,7 @@
 | 14      | Testing                              | [14-testing.md](14-testing.md)               |
 | 15      | Conclusion & Future Scope            | [15-conclusion.md](15-conclusion.md)            |
 | A       | Installation & Setup Guide (Windows/macOS/Linux) | [16-installation-guide.md](16-installation-guide.md) |
+| B       | SQL Queries                          | [17-sql-queries.md](17-sql-queries.md)           |
 
 ---
 
